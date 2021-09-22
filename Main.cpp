@@ -10,6 +10,6 @@ using namespace std;
 
 int main(){
     cout << "hello world" <<endl;
-    ifstream dataFile("/Users/wenxiu/Documents/GitHub/CZ4031-Database-System-Principles/data/data.tsv");
+    ifstream dataFile("/data/data.tsv");
     cout << "bye" <<endl; 
 }
