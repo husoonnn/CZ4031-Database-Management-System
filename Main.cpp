@@ -9,7 +9,7 @@
 #include "mem_pool.h"
 
 using namespace std; 
-#include <windows.h>
+// #include <windows.h>
 
 MemPool::CMemoryPool *g_ptrMemPool = NULL  ; //!< Global MemoryPool (Testing purpose)
 unsigned int TestCount             = 50000 ; //!< Nr of (de-)allocations (Testing purpose)
@@ -62,42 +62,81 @@ private :
    double m_fDoubleValue ;
 } ;
 
-/*! \class MyTestClass
- *  \brief Test Class ("Original" new/delete operator)
- *
- * The only purpose of this class is the testing of the Memory-Pool.
- */
-class MyTestClass
-{
-public :
-	MyTestClass()
-	{
-	  m_cMyArray[0] = 'H' ;
-	  m_cMyArray[1] = 'e' ;
-	  m_cMyArray[2] = 'l' ;
-	  m_cMyArray[3] = 'l' ;
-	  m_cMyArray[4] = 'o' ;
-	  m_cMyArray[5] = NULL ;
-	  m_strMyString = "This is a small Test-String" ;
-	  m_iMyInt = 12345 ;
+// Open test data
+  cout <<"Reading in data ... "<<endl;
+  std::ifstream file("../data/data.tsv"); // actual data
+  // std::ifstream file("../data/testdata.tsv"); // testing data
+  
 
-	  m_fFloatValue = 23456.7890f ;
-      m_fDoubleValue = 6789.012345 ;
+  // Insert data into database and populate list of addresses
+  if (file.is_open())
+  {
+    std::string line;
+    int recordNum = 0;
 
-      Next = this ;
-	}
+    while (std::getline(file, line))
+    {
+      //temporary struct Record
+      Record temp;
+      stringstream linestream(line);
+      string data;
 
-	virtual ~MyTestClass() {} ;
-private :
-   // Test-Data
-   char m_cMyArray[25] ;
-   unsigned char m_BigArray[10000] ;
-   std::string m_strMyString ;
-   int m_iMyInt ;
-   MyTestClass *Next ;
-   float m_fFloatValue ;
-   double m_fDoubleValue ;
-} ;
+      //assigning temp.tconst value
+      strcpy(temp.tconst, line.substr(0, line.find("\t")).c_str());
+      std::getline(linestream, data, '\t');
+
+      //assigning temp.averageRating & temp.numVotes values
+      linestream >> temp.averageRating >> temp.numVotes;
+
+      //insert this record into the database
+      Address tempAddress = disk.saveToDisk(&temp, sizeof(Record));
+
+      //build the bplustree as we insert records
+      tree.insert(tempAddress, float(temp.averageRating));
+
+      //logging
+      // cout << "Inserted record " << recordNum + 1 << " at block address: " << &tempAddress.blockAddress << " and offset " << &tempAddress.offset << endl;
+      recordNum += 1;
+    }
+    file.close();
+  }
+
+// /*! \class MyTestClass
+//  *  \brief Test Class ("Original" new/delete operator)
+//  *
+//  * The only purpose of this class is the testing of the Memory-Pool.
+//  */
+// class MyTestClass
+// {
+// public :
+// 	MyTestClass()
+// 	{
+// 	  m_cMyArray[0] = 'H' ;
+// 	  m_cMyArray[1] = 'e' ;
+// 	  m_cMyArray[2] = 'l' ;
+// 	  m_cMyArray[3] = 'l' ;
+// 	  m_cMyArray[4] = 'o' ;
+// 	  m_cMyArray[5] = NULL ;
+// 	  m_strMyString = "This is a small Test-String" ;
+// 	  m_iMyInt = 12345 ;
+
+// 	  m_fFloatValue = 23456.7890f ;
+//       m_fDoubleValue = 6789.012345 ;
+
+//       Next = this ;
+// 	}
+
+// 	virtual ~MyTestClass() {} ;
+// private :
+//    // Test-Data
+//    char m_cMyArray[25] ;
+//    unsigned char m_BigArray[10000] ;
+//    std::string m_strMyString ;
+//    int m_iMyInt ;
+//    MyTestClass *Next ;
+//    float m_fFloatValue ;
+//    double m_fDoubleValue ;
+// } ;
 
 /******************
 CreateGlobalMemPool
@@ -125,15 +164,15 @@ TestAllocationSpeedClassMemPool
 void TestAllocationSpeedClassMemPool()
 {
   std::cerr << "Allocating Memory (Object Size : " << sizeof(MyTestClass_OPOverload) << ")..." ;
-  timeBeginPeriod(1) ;
-  unsigned int MyStartTimeB = timeGetTime() ;
+//   timeBeginPeriod(1) ;
+//   unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	MyTestClass_OPOverload *ptrTestClass = new MyTestClass_OPOverload ;
 	delete ptrTestClass ;
   }
-  unsigned int MyEndTimeB = timeGetTime() ;
-  timeEndPeriod(1) ;
+//   unsigned int MyEndTimeB = timeGetTime() ;
+//   timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for MemPool(Class Test) : " << 'done' << " ms" << std::endl ;
@@ -145,15 +184,15 @@ TestAllocationSpeedClassHeap
 void TestAllocationSpeedClassHeap()
 {
   std::cerr << "Allocating Memory (Object Size : " << sizeof(MyTestClass) << ")..." ;
-  timeBeginPeriod(1) ;
-  unsigned int MyStartTimeB = timeGetTime() ;
+//   timeBeginPeriod(1) ;
+//   unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	MyTestClass *ptrTestClass = new MyTestClass ;
     delete ptrTestClass ;
-  }
-  unsigned int MyEndTimeB = timeGetTime() ;
-  timeEndPeriod(1) ;
+//   }
+//   unsigned int MyEndTimeB = timeGetTime() ;
+//   timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for Heap(Class Test)    : " << 'done2' << " ms" << std::endl ;
@@ -165,15 +204,15 @@ TestAllocationSpeedArrayMemPool
 void TestAllocationSpeedArrayMemPool()
 {
   std::cerr << "Allocating Memory (Object Size : " << ArraySize << ")..." ;
-  timeBeginPeriod(1) ;
-  unsigned int MyStartTimeB = timeGetTime() ;
+//   timeBeginPeriod(1) ;
+//   unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	  char *ptrArray = (char *) g_ptrMemPool->GetMemory(ArraySize)  ;
 	  g_ptrMemPool->FreeMemory(ptrArray, ArraySize) ;
   }
-  unsigned int MyEndTimeB = timeGetTime() ;
-  timeEndPeriod(1) ;
+//   unsigned int MyEndTimeB = timeGetTime() ;
+//   timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for MemPool(Array-Test) : " << 'done3' << " ms" << std::endl ;
@@ -185,15 +224,15 @@ TestAllocationSpeedArrayHeap
 void TestAllocationSpeedArrayHeap()
 {
   std::cerr << "Allocating Memory (Object Size : " << ArraySize << ")..." ;
-  timeBeginPeriod(1) ;
-  unsigned int MyStartTimeB = timeGetTime() ;
+//   timeBeginPeriod(1) ;
+//   unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	 char *ptrArray = (char *) malloc(ArraySize)  ;
 	 free(ptrArray) ;
   }
-  unsigned int MyEndTimeB = timeGetTime() ;
-  timeEndPeriod(1) ;
+//   unsigned int MyEndTimeB = timeGetTime() ;
+//   timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for Heap(Array-Test)    : " << 'done4' << " ms" << std::endl ;
