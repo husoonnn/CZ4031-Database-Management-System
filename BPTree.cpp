@@ -1,6 +1,7 @@
-#include "b_plus_tree.h"
-#include "memory_pool.h"
+#include "BPTree.h"
+#include "mem_pool.h"
 #include "types.h"
+
 #include <tuple>
 #include <iostream>
 #include <array>
@@ -17,10 +18,12 @@ Node::Node(int maxKeys)
   keys = new float[maxKeys];
   pointers = new Address[maxKeys + 1];
 
-  for (int i = 0; i < maxKeys + 1; i++)
+  int i = 0;
+  while(i < maxKeys + 1)
   {
     Address nullAddress{(void *)myNullPtr, 0};
     pointers[i] = nullAddress;
+    i++;
   }
   numKeys = 0;
 }
