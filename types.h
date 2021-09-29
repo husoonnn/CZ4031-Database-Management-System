@@ -11,7 +11,7 @@ struct Address
 // Defines a single movie record (read from data file).
 struct Record
 {
-  char tconst[10];     // ID of the movie.
+  char tconst[12];     // ID of the movie.
   float averageRating; // Average rating of this movie.
   int numVotes;        // Number of votes of this movie.
 };
