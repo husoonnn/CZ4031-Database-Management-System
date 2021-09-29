@@ -37,7 +37,9 @@ int BlockSizeSelect(){
     return 0;
 }
 
-void Fileprocessor(){
+void Experiment1(int blocksize){
+
+    MemoryPool disk(1500,blocksize);
 
     std::fstream file;
 
@@ -52,17 +54,16 @@ void Fileprocessor(){
             r.averageRating = std::atof(tp.c_str());
             getline(file,tp,'\t');
             r.numVotes = std::atoi(tp.c_str());
+
+            Address address = disk.saveToDisk(&r, sizeof(Record));
         }
         file.close();
-    }
-}
-
-void Experiment1(int blocksize){
     
-    MemoryPool disk(150000000,blocksize);
     
-    std::cout<<"Number of blocks: "<<endl;
+    
+    std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
     std::cout<<"Size of database: "<<endl;
+    }
 }
 
 void Experiment2(){
@@ -84,8 +85,6 @@ void Experiment5(){
 int main(){
     
     int blocksize = BlockSizeSelect();
-
-    Fileprocessor();
 
     //allocate by seperating into multiple nodes per block
 

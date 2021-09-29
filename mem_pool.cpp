@@ -57,7 +57,7 @@ Address MemoryPool::AllocateBlock(std:: size_t recordsize){
 
   //do updates 
   blocksizeused += recordsize;
-  blocksizeleft = blocksize - recordsize;
+  blocksizeleft = blocksize - blocksizeused;
   //update pointer after insert 
   block = (char *)block + recordsize;
 

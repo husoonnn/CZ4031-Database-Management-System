@@ -40,6 +40,10 @@ class MemoryPool {
 
     Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
+    int getNumOfBlocks() const {
+      return numofblocks;
+    }
+
 };
 
 #endif
