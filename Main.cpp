@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <tuple>
 #include <unordered_map>
@@ -37,21 +38,33 @@ int BlockSizeSelect(){
     return 0;
 }
 
-void Fileprocessor(string filename){
+void Fileprocessor(){
 
-    std::ifstream file(filename);
+    std::fstream file;
     std::vector<Record> v;
     std::string line;
+    int counter = 0;
 
-    while(std::getline(file,line)){
-        std::istringstream is(line);
-        Record r;
-        std::string s;
-
-        std::getline(is,s,'\t');
-        r.tconst = std::stoi(s);
+    file.open("data/data.tsv",ios::in);
+    if (file.is_open()){
+        std::string tp;
+        while(getline(file,tp,'\t')){
+            Record r;
+            if (counter==1){
+                r.averageRating = stof(tp);
+                counter+=1;
+            }
+            else if (counter==2){
+                r.numVotes = stoi(tp);
+                counter+=1;
+            }
+            else{
+                 strcpy(r.tconst,tp.c_str());
+                 counter = 1;
+            }
+        }
+        file.close();
     }
-
 }
 
 void Experiment1(){
@@ -78,7 +91,7 @@ int main(){
     
     //int blocksize = BlockSizeSelect();
 
-    Fileprocessor("data.tsv");
+    Fileprocessor();
 
     //allocate by seperating into multiple nodes per block
 
