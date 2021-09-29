@@ -52,9 +52,10 @@ Address MemoryPool::AllocateBlock(std:: size_t recordsize){
   }; 
 
   //insert into the block 
-  //update variables
+  // Update variables
   short int offset = blocksizeused; 
 
+  //do updates 
   blocksizeused += recordsize;
   blocksizeleft = blocksize - recordsize;
   //update pointer after insert 
