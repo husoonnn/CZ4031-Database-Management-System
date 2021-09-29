@@ -1,5 +1,6 @@
 #include "mem_pool.h"
 #include "types.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -48,15 +49,18 @@ void Fileprocessor(){
             getline(file,tp,'\t');
             strcpy(r.tconst,tp.c_str());
             getline(file,tp,'\t');
-            r.averageRating = std::stof(tp);
+            r.averageRating = std::atof(tp.c_str());
             getline(file,tp,'\t');
-            r.numVotes = std::stoi(tp);
+            r.numVotes = std::atoi(tp.c_str());
         }
         file.close();
     }
 }
 
-void Experiment1(){
+void Experiment1(int blocksize){
+    
+    MemoryPool disk(150000000,blocksize);
+    
     std::cout<<"Number of blocks: "<<endl;
     std::cout<<"Size of database: "<<endl;
 }
@@ -79,13 +83,13 @@ void Experiment5(){
 
 int main(){
     
-    //int blocksize = BlockSizeSelect();
+    int blocksize = BlockSizeSelect();
 
     Fileprocessor();
 
     //allocate by seperating into multiple nodes per block
 
-    //Experiment1();
+    Experiment1(blocksize);
     //insert function of experiment 2
     //insert function of experiment 3
     //insert function of experiment 4
