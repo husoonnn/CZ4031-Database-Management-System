@@ -36,9 +36,9 @@ class MemoryPool {
 
     void* loadFromDisk(Address address, std::size_t size);
 
-    Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size); 
+    Address saveToDisk(void *itemAddress, std::size_t size); 
 
-    Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
+    Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
 };
 

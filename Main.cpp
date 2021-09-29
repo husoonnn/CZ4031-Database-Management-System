@@ -41,32 +41,26 @@ int BlockSizeSelect(){
 void Fileprocessor(){
 
     std::fstream file;
-    int counter = 0;
 
     file.open("data/data.tsv",ios::in);
     if (file.is_open()){
         std::string tp;
-        while(getline(file,tp,'\t')){
+        while(getline(file,tp)){
             Record r;
-            if (counter==1){
-                r.averageRating = stof(tp);
-                counter+=1;
-            }
-            else if (counter==2){
-                r.numVotes = stoi(tp);
-                counter+=1;
-            }
-            else{
-                strcpy(r.tconst,tp.c_str());
-                counter = 1;
-            }
+            getline(file,tp,'\t');
+            strcpy(r.tconst,tp.c_str());
+            getline(file,tp,'\t');
+            r.averageRating = std::stof(tp);
+            getline(file,tp,'\t');
+            r.numVotes = std::stoi(tp);
         }
         file.close();
     }
 }
 
 void Experiment1(){
-    
+    std::cout<<"Number of blocks: "<<endl;
+    std::cout<<"Size of database: "<<endl;
 }
 
 void Experiment2(){
@@ -93,7 +87,7 @@ int main(){
 
     //allocate by seperating into multiple nodes per block
 
-    Experiment1();
+    //Experiment1();
     //insert function of experiment 2
     //insert function of experiment 3
     //insert function of experiment 4
