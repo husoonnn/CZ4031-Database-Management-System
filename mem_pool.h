@@ -15,20 +15,30 @@ class MemoryPool {
     std::size_t poolsizeleft;
     std::size_t blocksizeleft;
     std::size_t blocksize;
-    int num_of_blocks;
+    int numofblocks;
 
-    void *pool;
-    void *block;
+    void* pool; //pointer to memory pool
+    void* block; //pointer to block we are accessing
 
   public:
 
     MemoryPool(std::size_t MaxPoolSize, std::size_t BlockSize);
 
-    bool checkblocksize(std::size_t recordsize, std::size_t BlockSizeLeft);
+    bool CheckBlockSize(std::size_t recordsize);
 
-    Address Allocateblock(bool CheckBlockSize);
+    bool CheckMaxPool(); 
+
+    Address AllocateBlock(std::size_t recordsize);
 
     Address Deallocate();
+
+    bool NewBlock();
+
+    void* loadFromDisk(Address address, std::size_t size);
+
+    Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size); 
+
+    Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
 };
 

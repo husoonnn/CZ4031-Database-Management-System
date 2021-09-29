@@ -1,4 +1,4 @@
-   
+
 #include "mem_pool.h"
 #include "types.h"
 
@@ -11,6 +11,39 @@
 #include <unordered_map>
 
 using namespace std;
+
+// Insert data into database and populate list of addresses
+  if (file.is_open())
+  {
+    std::string line;
+    int recordNum = 0;
+
+    while (std::getline(file, line))
+    {
+      //temporary struct Record
+      Record temp;
+      stringstream linestream(line);
+      string data;
+
+      //assigning temp.tconst value
+      strcpy(temp.tconst, line.substr(0, line.find("\t")).c_str());
+      std::getline(linestream, data, '\t');
+
+      //assigning temp.averageRating & temp.numVotes values
+      linestream >> temp.averageRating >> temp.numVotes;
+
+      //insert this record into the database
+      Address tempAddress = disk.saveToDisk(&temp, sizeof(Record));
+
+      //build the bplustree as we insert records
+      tree.insert(tempAddress, float(temp.averageRating));
+
+      //logging
+      // cout << "Inserted record " << recordNum + 1 << " at block address: " << &tempAddress.blockAddress << " and offset " << &tempAddress.offset << endl;
+      recordNum += 1;
+    }
+    file.close();
+  }
 
 //Get user choice for 100B or 500B
 int BlockSizeSelect(){
