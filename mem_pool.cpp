@@ -1,150 +1,469 @@
 #include "mem_pool.h"
-#include "types.h"
 
-#include <iostream>
-#include <vector>
-#include <tuple>
-#include <cstring>
-
-// We need to create a general memory pool that can be used for both the relational data and the index.
-// This pool should be able to assign new blocks if necessary.
-
-// Constructors
-
-MemoryPool::MemoryPool(std::size_t maxPoolSize, std::size_t blockSize)
+namespace MemPool
 {
-  this->maxPoolSize = maxPoolSize;
-  this->blockSize = blockSize;
-  this->sizeUsed = 0;
-  this->actualSizeUsed = 0;
-  this->allocated = 0;
 
-  // Create pool of blocks.
-  this->pool = operator new(maxPoolSize);
-  std::memset(pool, '\0', maxPoolSize); // Initialize pool all to null.
-  this->block = nullptr;
-  this->blockSizeUsed = 0;
+static const int FREEED_MEMORY_CONTENT        = 0xAA ; //!< Value for freed memory  
+static const int NEW_ALLOCATED_MEMORY_CONTENT = 0xFF ; //!< Initial Value for new allocated memory 
 
-  this->blocksAccessed = 0;
+/******************
+Constructor
+******************/
+CMemoryPool::CMemoryPool(const std::size_t &sInitialMemoryPoolSize,
+		                 const std::size_t &sMemoryChunkSize,
+				         const std::size_t &sMinimalMemorySizeToAllocate,
+				         bool bSetMemoryData)
+{
+ m_ptrFirstChunk  = NULL ;
+ m_ptrLastChunk   = NULL ;
+ m_ptrCursorChunk = NULL ;
+
+ m_sTotalMemoryPoolSize = 0 ;
+ m_sUsedMemoryPoolSize  = 0 ;
+ m_sFreeMemoryPoolSize  = 0 ;
+
+ m_sMemoryChunkSize   = sMemoryChunkSize ;
+ m_uiMemoryChunkCount = 0 ;
+ m_uiObjectCount      = 0 ;
+
+ m_bSetMemoryData               = bSetMemoryData ;
+ m_sMinimalMemorySizeToAllocate = sMinimalMemorySizeToAllocate ;
+
+ // Allocate the Initial amount of Memory from the Operating-System...
+ AllocateMemory(sInitialMemoryPoolSize) ;
 }
 
-// Methods
-
-bool MemoryPool::allocateBlock()
+/******************
+Destructor
+******************/
+CMemoryPool::~CMemoryPool()
 {
-  // Only allocate a new block if we don't exceed maxPoolSize.
-  if (sizeUsed + blockSize <= maxPoolSize)
+  FreeAllAllocatedMemory() ;
+  DeallocateAllChunks() ;
+   
+  // Check for possible Memory-Leaks...
+  assert((m_uiObjectCount == 0) && "WARNING : Memory-Leak : You have not freed all allocated Memory") ;
+}
+
+/******************
+GetMemory
+******************/
+void *CMemoryPool::GetMemory(const std::size_t &sMemorySize)
+{
+  std::size_t sBestMemBlockSize = CalculateBestMemoryBlockSize(sMemorySize) ;  
+  SMemoryChunk *ptrChunk = NULL ;
+  while(!ptrChunk)
   {
-    // Update variables
-    sizeUsed += blockSize;
-    block = (char *)pool + allocated * blockSize; // Set current block pointer to new block.
-    blockSizeUsed = 0;                    // Reset offset to 0.
-    allocated += 1;
-    return true;
+    // Is a Chunks available to hold the requested amount of Memory ?
+    ptrChunk = FindChunkSuitableToHoldMemory(sBestMemBlockSize) ;
+    if(!ptrChunk)
+    {
+	  // No chunk can be found
+	  // => Memory-Pool is to small. We have to request 
+	  //    more Memory from the Operating-System....
+	  sBestMemBlockSize = MaxValue(sBestMemBlockSize, CalculateBestMemoryBlockSize(m_sMinimalMemorySizeToAllocate)) ;
+      AllocateMemory(sBestMemBlockSize) ;
+    }
+  }
+
+  // Finally, a suitable Chunk was found.
+  // Adjust the Values of the internal "TotalSize"/"UsedSize" Members and 
+  // the Values of the MemoryChunk itself.
+  m_sUsedMemoryPoolSize += sBestMemBlockSize ;
+  m_sFreeMemoryPoolSize -= sBestMemBlockSize ;
+  m_uiObjectCount++ ;
+  SetMemoryChunkValues(ptrChunk, sBestMemBlockSize) ;
+
+  // eventually, return the Pointer to the User
+  return ((void *) ptrChunk->Data) ;
+}
+
+/******************
+FreeMemory
+******************/
+void CMemoryPool::FreeMemory(void *ptrMemoryBlock, const std::size_t &sMemoryBlockSize)
+{
+  // Search all Chunks for the one holding the "ptrMemoryBlock"-Pointer
+  // ("SMemoryChunk->Data == ptrMemoryBlock"). Eventually, free that Chunks,
+  // so it beecomes available to the Memory-Pool again...
+  SMemoryChunk *ptrChunk = FindChunkHoldingPointerTo(ptrMemoryBlock) ;
+  if(ptrChunk)
+  {
+	  //std::cerr << "Freed Chunks OK (Used memPool Size : " << m_sUsedMemoryPoolSize << ")" << std::endl ;
+	  FreeChunks(ptrChunk) ;
   }
   else
   {
-    std::cout << "Error: No memory left to allocate new block (" << sizeUsed << "/" << maxPoolSize << " used)." << '\n';
-    return false;
+	  assert(false && "ERROR : Requested Pointer not in Memory Pool") ;
   }
+  assert((m_uiObjectCount > 0) && "ERROR : Request to delete more Memory then allocated.") ;
+  m_uiObjectCount-- ;
 }
 
-Address MemoryPool::allocate(std::size_t sizeRequired)
+/******************
+AllocateMemory
+******************/
+bool CMemoryPool::AllocateMemory(const std::size_t &sMemorySize)
 {
-  // If record size exceeds block size, throw an error.
-  if (sizeRequired > blockSize)
+  // This function will allocate *at least* "sMemorySize"-Bytes from the Operating-System.
+
+  // How it works :
+  // Calculate the amount of "SMemoryChunks" needed to manage the requested MemorySize.
+  // Every MemoryChunk can manage only a certain amount of Memory
+  // (set by the "m_sMemoryChunkSize"-Member of the Memory-Pool).
+  //
+  // Also, calculate the "Best" Memory-Block size to allocate from the 
+  // Operating-System, so that all allocated Memory can be assigned to a
+  // Memory Chunk.
+  // Example : 
+  //	You want to Allocate 120 Bytes, but every "SMemoryChunk" can only handle
+  //    50 Bytes ("m_sMemoryChunkSize = 50").
+  //    So, "CalculateNeededChunks()" will return the Number of Chunks needed to
+  //    manage 120 Bytes. Since it is not possible to divide 120 Bytes in to
+  //    50 Byte Chunks, "CalculateNeededChunks()" returns 3.
+  //    ==> 3 Chunks can Manage 150 Bytes of data (50 * 3 = 150), so
+  //        the requested 120 Bytes will fit into this Block.
+  //    "CalculateBestMemoryBlockSize()" will return the amount of memory needed
+  //    to *perfectly* subdivide the allocated Memory into "m_sMemoryChunkSize" (= 50) Byte
+  //    pieces. -> "CalculateBestMemoryBlockSize()" returns 150.
+  //    So, 150 Bytes of memory are allocated from the Operating-System and
+  //    subdivided into 3 Memory-Chunks (each holding a Pointer to 50 Bytes of the allocated memory).
+  //    Since only 120 Bytes are requested, we have a Memory-Overhead of 
+  //    150 - 120 = 30 Bytes. 
+  //    Note, that the Memory-overhead is not a bad thing, because we can use 
+  //    that memory later (it remains in the Memory-Pool).
+  //
+
+  unsigned int uiNeededChunks = CalculateNeededChunks(sMemorySize) ;
+  std::size_t sBestMemBlockSize = CalculateBestMemoryBlockSize(sMemorySize) ;
+
+  TByte *ptrNewMemBlock = (TByte *) malloc(sBestMemBlockSize) ; // allocate from Operating System
+  SMemoryChunk *ptrNewChunks = (SMemoryChunk *) malloc((uiNeededChunks * sizeof(SMemoryChunk))) ; // allocate Chunk-Array to Manage the Memory
+  assert(((ptrNewMemBlock) && (ptrNewChunks)) && "Error : System ran out of Memory") ;
+
+  // Adjust internal Values (Total/Free Memory, etc.)
+  m_sTotalMemoryPoolSize += sBestMemBlockSize ;
+  m_sFreeMemoryPoolSize += sBestMemBlockSize ;
+  m_uiMemoryChunkCount += uiNeededChunks ;
+
+  // Usefull for Debugging : Set the Memory-Content to a defined Value
+  if(m_bSetMemoryData)
   {
-    std::cout << "Error: Size required larger than block size (" << sizeRequired << " vs " << blockSize << ")! Increase block size to store data." << '\n';
-    throw std::invalid_argument("Requested size too large!");
+    memset(((void *) ptrNewMemBlock), NEW_ALLOCATED_MEMORY_CONTENT, sBestMemBlockSize) ;
   }
 
-  // If no current block, or record can't fit into current block, make a new block.
-  if (allocated == 0 || (blockSizeUsed + sizeRequired > blockSize))
+  // Associate the allocated Memory-Block with the Linked-List of MemoryChunks
+  return LinkChunksToData(ptrNewChunks, uiNeededChunks, ptrNewMemBlock) ; ;
+}
+
+/******************
+CalculateNeededChunks
+******************/
+unsigned int CMemoryPool::CalculateNeededChunks(const std::size_t &sMemorySize)
+{
+   float f = (float) (((float)sMemorySize) / ((float)m_sMemoryChunkSize)) ;
+   return ((unsigned int) ceil(f)) ;
+}
+
+/******************
+CalculateBestMemoryBlockSize
+******************/
+std::size_t CMemoryPool::CalculateBestMemoryBlockSize(const std::size_t &sRequestedMemoryBlockSize)
+{
+  unsigned int uiNeededChunks = CalculateNeededChunks(sRequestedMemoryBlockSize) ;
+  return std::size_t((uiNeededChunks * m_sMemoryChunkSize)) ;
+}
+
+/******************
+FreeChunks
+******************/
+void CMemoryPool::FreeChunks(SMemoryChunk *ptrChunk)
+{
+  // Make the Used Memory of the given Chunk available
+  // to the Memory Pool again.
+
+  SMemoryChunk *ptrCurrentChunk = ptrChunk ;
+  unsigned int uiChunkCount = CalculateNeededChunks(ptrCurrentChunk->UsedSize);
+  for(unsigned int i = 0; i < uiChunkCount; i++)
   {
-    bool isSuccessful = allocateBlock();
-    if (!isSuccessful)
+    if(ptrCurrentChunk)
     {
-      throw std::logic_error("Failed to allocate new block!");
-    }
+      // Step 1 : Set the allocated Memory to 'FREEED_MEMORY_CONTENT'
+      // Note : This is fully Optional, but usefull for debugging
+	  if(m_bSetMemoryData)
+	  {
+        memset(((void *) ptrCurrentChunk->Data), FREEED_MEMORY_CONTENT, m_sMemoryChunkSize) ;
+	  }
+
+      // Step 2 : Set the Used-Size to Zero
+      ptrCurrentChunk->UsedSize = 0 ;
+
+      // Step 3 : Adjust Memory-Pool Values and goto next Chunk
+      m_sUsedMemoryPoolSize -= m_sMemoryChunkSize ;
+      ptrCurrentChunk = ptrCurrentChunk->Next ;
+	}
   }
-
-  // Update variables
-  short int offset = blockSizeUsed;
-
-  blockSizeUsed += sizeRequired;
-  actualSizeUsed += sizeRequired;
-
-  // Return the new memory space to put in the record.
-  Address recordAddress = {block, offset};
-
-  return recordAddress;
 }
 
-bool MemoryPool::deallocate(Address address, std::size_t sizeToDelete)
+
+/******************
+FindChunkSuitableToHoldMemory
+******************/
+SMemoryChunk *CMemoryPool::FindChunkSuitableToHoldMemory(const std::size_t &sMemorySize)
 {
-  try
+  // Find a Chunk to hold *at least* "sMemorySize" Bytes.
+  unsigned int uiChunksToSkip = 0 ;
+  bool bContinueSearch = true ;
+  SMemoryChunk *ptrChunk = m_ptrCursorChunk ; // Start search at Cursor-Pos.
+  for(unsigned int i = 0; i < m_uiMemoryChunkCount; i++)
   {
-    // Remove record from block.
-    void *addressToDelete = (char *)address.blockAddress + address.offset;
-    std::memset(addressToDelete, '\0', sizeToDelete);
-
-    // Update actual size used.
-    actualSizeUsed -= sizeToDelete;
-
-    // If block is empty, just remove the size of the block (but don't deallocate block!).
-    // Create a new test block full of NULL to test against the actual block to see if it's empty.
-    unsigned char testBlock[blockSize];
-    memset(testBlock, '\0', blockSize);
-
-    // Block is empty, remove size of block.
-    if (memcmp(testBlock, address.blockAddress, blockSize) == 0)
+    if(ptrChunk)
     {
-      sizeUsed -= blockSize;
-      allocated--;
-    }
+	  if(ptrChunk == m_ptrLastChunk) // End of List reached : Start over from the beginning
+	  {
+        ptrChunk = m_ptrFirstChunk ;
+	  }
 
-    return true;
+      if(ptrChunk->DataSize >= sMemorySize)
+      {
+        if(ptrChunk->UsedSize == 0)
+        {
+		  m_ptrCursorChunk = ptrChunk ;
+          return ptrChunk ;
+        }
+      }
+      uiChunksToSkip = CalculateNeededChunks(ptrChunk->UsedSize) ;
+	  if(uiChunksToSkip == 0) uiChunksToSkip = 1 ;
+      ptrChunk = SkipChunks(ptrChunk, uiChunksToSkip) ;
+	}
+	else
+	{
+      bContinueSearch = false ;
+	}
   }
-  catch (...)
+  return NULL ;
+}
+
+/******************
+SkipChunks
+******************/
+SMemoryChunk *CMemoryPool::SkipChunks(SMemoryChunk *ptrStartChunk, unsigned int uiChunksToSkip)
+{
+	SMemoryChunk *ptrCurrentChunk = ptrStartChunk ;
+	for(unsigned int i = 0; i < uiChunksToSkip; i++)
+	{
+		if(ptrCurrentChunk)
+		{
+		   ptrCurrentChunk = ptrCurrentChunk->Next ;
+		}
+		else
+		{
+			// Will occur, if you try to Skip more Chunks than actually available
+			// from your "ptrStartChunk" 
+			assert(false && "Error : Chunk == NULL was not expected.") ;
+			break ;
+		}
+	}
+	return ptrCurrentChunk ;
+}
+
+/******************
+SetMemoryChunkValues
+******************/
+void CMemoryPool::SetMemoryChunkValues(SMemoryChunk *ptrChunk, const std::size_t &sMemBlockSize)
+{
+  if((ptrChunk)) // && (ptrChunk != m_ptrLastChunk))
   {
-    std::cout << "Error: Could not remove record/block at given address (" << address.blockAddress << ") and offset (" << address.offset << ")." << '\n';
-    return false;
-  };
+    ptrChunk->UsedSize = sMemBlockSize ;
+  }
+  else
+  {
+	  assert(false && "Error : Invalid NULL-Pointer passed") ;
+  }
 }
 
-// Give a block address, offset and size, returns the data there.
-void *MemoryPool::loadFromDisk(Address address, std::size_t size)
+/******************
+WriteMemoryDumpToFile
+******************/
+bool CMemoryPool::WriteMemoryDumpToFile(const std::string &strFileName)
 {
-  void *mainMemoryAddress = operator new(size);
-  std::memcpy(mainMemoryAddress, (char *)address.blockAddress + address.offset, size);
+  bool bWriteSuccesfull = false ;
+  std::ofstream ofOutputFile ;
+  ofOutputFile.open(strFileName.c_str(), std::ofstream::out | std::ofstream::binary) ;
 
-  // Update blocks accessed
-  blocksAccessed++;
-
-  return mainMemoryAddress;
+  SMemoryChunk *ptrCurrentChunk = m_ptrFirstChunk ;
+  while(ptrCurrentChunk)
+  {
+    if(ofOutputFile.good())
+    {
+		ofOutputFile.write(((char *)ptrCurrentChunk->Data), ((std::streamsize) m_sMemoryChunkSize)) ;
+      bWriteSuccesfull = true ;
+    }
+    ptrCurrentChunk = ptrCurrentChunk->Next ;
+  }
+  ofOutputFile.close() ;
+  return bWriteSuccesfull ;
 }
 
-// Saves something into the disk. Returns disk address.
-Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size)
+/******************
+LinkChunksToData
+******************/
+bool CMemoryPool::LinkChunksToData(SMemoryChunk *ptrNewChunks, unsigned int uiChunkCount, TByte *ptrNewMemBlock)
 {
-  Address diskAddress = allocate(size);
-  std::memcpy((char *)diskAddress.blockAddress + diskAddress.offset, itemAddress, size);
+  SMemoryChunk *ptrNewChunk = NULL ;
+  unsigned int uiMemOffSet = 0 ;
+  bool bAllocationChunkAssigned = false ;
+  for(unsigned int i = 0; i < uiChunkCount; i++)
+  {
+    if(!m_ptrFirstChunk)
+    {
+      m_ptrFirstChunk = SetChunkDefaults(&(ptrNewChunks[0])) ;
+      m_ptrLastChunk = m_ptrFirstChunk ;
+      m_ptrCursorChunk = m_ptrFirstChunk ;
+    }
+    else
+    {
+      ptrNewChunk = SetChunkDefaults(&(ptrNewChunks[i])) ;
+      m_ptrLastChunk->Next = ptrNewChunk ;
+      m_ptrLastChunk = ptrNewChunk ;
+    }
+    
+	uiMemOffSet = (i * ((unsigned int) m_sMemoryChunkSize)) ;
+    m_ptrLastChunk->Data = &(ptrNewMemBlock[uiMemOffSet]) ;
 
-  // Update blocks accessed
-  blocksAccessed++;
-
-  return diskAddress;
+	// The first Chunk assigned to the new Memory-Block will be 
+	// a "AllocationChunk". This means, this Chunks stores the
+	// "original" Pointer to the MemBlock and is responsible for
+	// "free()"ing the Memory later....
+	if(!bAllocationChunkAssigned)
+	{
+		m_ptrLastChunk->IsAllocationChunk = true ;
+		bAllocationChunkAssigned = true ;
+	}
+  }
+  return RecalcChunkMemorySize(m_ptrFirstChunk, m_uiMemoryChunkCount) ;
 }
 
-// Update data in disk if I have already saved it before.
-Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address diskAddress)
+/******************
+RecalcChunkMemorySize
+******************/
+bool CMemoryPool::RecalcChunkMemorySize(SMemoryChunk *ptrChunk, unsigned int uiChunkCount)
 {
-  std::memcpy((char *)diskAddress.blockAddress + diskAddress.offset, itemAddress, size);
-
-  // Update blocks accessed
-  blocksAccessed++;
-
-  return diskAddress;
+  unsigned int uiMemOffSet = 0 ;
+  for(unsigned int i = 0; i < uiChunkCount; i++)
+  {
+	  if(ptrChunk)
+	  {
+	    uiMemOffSet = (i * ((unsigned int) m_sMemoryChunkSize)) ;
+	    ptrChunk->DataSize = (((unsigned int) m_sTotalMemoryPoolSize) - uiMemOffSet) ;
+	    ptrChunk = ptrChunk->Next ;
+	  }
+	  else
+	  {
+		assert(false && "Error : ptrChunk == NULL") ;
+        return false ;
+	  }
+  }
+  return true ;
 }
 
-MemoryPool::~MemoryPool(){};
+/******************
+SetChunkDefaults
+******************/
+SMemoryChunk *CMemoryPool::SetChunkDefaults(SMemoryChunk *ptrChunk)
+{
+  if(ptrChunk)
+  {
+    ptrChunk->Data = NULL ;
+    ptrChunk->DataSize = 0 ;
+    ptrChunk->UsedSize = 0 ;
+	ptrChunk->IsAllocationChunk = false ;
+    ptrChunk->Next = NULL ;
+  }
+  return ptrChunk ;
+}
+
+/******************
+FindChunkHoldingPointerTo
+******************/
+SMemoryChunk *CMemoryPool::FindChunkHoldingPointerTo(void *ptrMemoryBlock)
+{
+	SMemoryChunk *ptrTempChunk = m_ptrFirstChunk ;
+	while(ptrTempChunk)
+	{
+		if(ptrTempChunk->Data == ((TByte *) ptrMemoryBlock))
+		{
+			break ;
+		}
+		ptrTempChunk = ptrTempChunk->Next ;
+	}
+	return ptrTempChunk ;
+}
+
+/******************
+FreeAllAllocatedMemory
+******************/
+void CMemoryPool::FreeAllAllocatedMemory()
+{
+	SMemoryChunk *ptrChunk = m_ptrFirstChunk ;
+	while(ptrChunk)
+	{
+		if(ptrChunk->IsAllocationChunk)
+		{
+			free(((void *) (ptrChunk->Data))) ;
+		}
+		ptrChunk = ptrChunk->Next ;
+	}
+}
+
+/******************
+DeallocateAllChunks
+******************/
+void CMemoryPool::DeallocateAllChunks()
+{
+  SMemoryChunk *ptrChunk = m_ptrFirstChunk ;
+  SMemoryChunk *ptrChunkToDelete = NULL ;
+  while(ptrChunk)
+  {
+	if(ptrChunk->IsAllocationChunk)
+	{	
+		if(ptrChunkToDelete)
+		{
+			free(((void *) ptrChunkToDelete)) ;
+		}
+		ptrChunkToDelete = ptrChunk ;
+	}
+	ptrChunk = ptrChunk->Next ;
+  }
+}
+
+/******************
+IsValidPointer
+******************/
+bool CMemoryPool::IsValidPointer(void *ptrPointer)
+{
+    SMemoryChunk *ptrChunk = m_ptrFirstChunk ;
+	while(ptrChunk)
+	{
+		if(ptrChunk->Data == ((TByte *) ptrPointer))
+		{
+			return true ;
+		}
+		ptrChunk = ptrChunk->Next ;
+	}
+	return false ;
+}
+
+/******************
+MaxValue
+******************/
+std::size_t CMemoryPool::MaxValue(const std::size_t &sValueA, const std::size_t &sValueB) const
+{
+  if(sValueA > sValueB)
+  {
+	  return sValueA ;
+  }
+  return sValueB ;
+}
+
+}
