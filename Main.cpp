@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 #include "mem_pool.h"
 #include "types.h"
-=======
-
-#include "mem_pool.h"
-#include "types.h"
-
->>>>>>> 6e194e56e248d1baa8ff300eca087f1db29df369
 #include <iostream>
 #include <fstream>
 #include <sstream>
