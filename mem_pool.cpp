@@ -42,7 +42,7 @@ bool MemoryPool::CheckBlockSize(std::size_t recordsize){
 // insert record into block 
 Address MemoryPool::AllocateBlock(std:: size_t recordsize){
   //if block size cannot fit new record, create new block
-  if (!CheckBlockSize){
+  if (!CheckBlockSize(recordsize)){
     //create a new block
     NewBlock();
     //if new block cannot be created, exception error 
@@ -80,7 +80,7 @@ bool MemoryPool::CheckMaxPool(){
 //done. 
 bool MemoryPool::NewBlock(){
   //create newblock if we didn't exceed maxpoolsize 
-  if (!CheckMaxPool){
+  if (!CheckMaxPool()){
     block = (char *)pool + numofblocks * blocksize; //move pointer to start of new block 
     blocksizeused += blocksize; //update blocksizeused 
     blocksizeused = 0; //reset block size used 
@@ -132,6 +132,6 @@ Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address disk
 }
 
 //kiv maybe don;t do deallocation 
-Address MemoryPool::Deallocate(){
+//Address MemoryPool::Deallocate(){
 
-}
+//}
