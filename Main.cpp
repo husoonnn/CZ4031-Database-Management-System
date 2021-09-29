@@ -1,27 +1,15 @@
-   
-// #include <iostream>
-// #include <fstream>
-// #include <sstream>
-// #include <string>
-// #include <vector>
-// #include <tuple>
-// #include <unordered_map>
-
-// using namespace std;
-
-// int main(){
-    
-//     cout << "hello world" <<endl;
-
-//     cout << "byebye" <<endl;
-
-
-// }
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <tuple>
+#include <unordered_map>
+#include <cstring>
 #include "mem_pool.h"
 
 using namespace std; 
-// #include <windows.h>
+#include <windows.h>
 
 MemPool::CMemoryPool *g_ptrMemPool = NULL  ; //!< Global MemoryPool (Testing purpose)
 unsigned int TestCount             = 50000 ; //!< Nr of (de-)allocations (Testing purpose)
@@ -137,15 +125,15 @@ TestAllocationSpeedClassMemPool
 void TestAllocationSpeedClassMemPool()
 {
   std::cerr << "Allocating Memory (Object Size : " << sizeof(MyTestClass_OPOverload) << ")..." ;
-//   timeBeginPeriod(1) ;
-//   unsigned int MyStartTimeB = timeGetTime() ;
+  timeBeginPeriod(1) ;
+  unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	MyTestClass_OPOverload *ptrTestClass = new MyTestClass_OPOverload ;
 	delete ptrTestClass ;
   }
-//   unsigned int MyEndTimeB = timeGetTime() ;
-//   timeEndPeriod(1) ;
+  unsigned int MyEndTimeB = timeGetTime() ;
+  timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for MemPool(Class Test) : " << 'done' << " ms" << std::endl ;
@@ -157,15 +145,15 @@ TestAllocationSpeedClassHeap
 void TestAllocationSpeedClassHeap()
 {
   std::cerr << "Allocating Memory (Object Size : " << sizeof(MyTestClass) << ")..." ;
-//   timeBeginPeriod(1) ;
-//   unsigned int MyStartTimeB = timeGetTime() ;
+  timeBeginPeriod(1) ;
+  unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	MyTestClass *ptrTestClass = new MyTestClass ;
     delete ptrTestClass ;
   }
-//   unsigned int MyEndTimeB = timeGetTime() ;
-//   timeEndPeriod(1) ;
+  unsigned int MyEndTimeB = timeGetTime() ;
+  timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for Heap(Class Test)    : " << 'done2' << " ms" << std::endl ;
@@ -177,15 +165,15 @@ TestAllocationSpeedArrayMemPool
 void TestAllocationSpeedArrayMemPool()
 {
   std::cerr << "Allocating Memory (Object Size : " << ArraySize << ")..." ;
-//   timeBeginPeriod(1) ;
-//   unsigned int MyStartTimeB = timeGetTime() ;
+  timeBeginPeriod(1) ;
+  unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	  char *ptrArray = (char *) g_ptrMemPool->GetMemory(ArraySize)  ;
 	  g_ptrMemPool->FreeMemory(ptrArray, ArraySize) ;
   }
-//   unsigned int MyEndTimeB = timeGetTime() ;
-//   timeEndPeriod(1) ;
+  unsigned int MyEndTimeB = timeGetTime() ;
+  timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for MemPool(Array-Test) : " << 'done3' << " ms" << std::endl ;
@@ -197,15 +185,15 @@ TestAllocationSpeedArrayHeap
 void TestAllocationSpeedArrayHeap()
 {
   std::cerr << "Allocating Memory (Object Size : " << ArraySize << ")..." ;
-//   timeBeginPeriod(1) ;
-//   unsigned int MyStartTimeB = timeGetTime() ;
+  timeBeginPeriod(1) ;
+  unsigned int MyStartTimeB = timeGetTime() ;
   for(unsigned int j = 0; j < TestCount; j++)
   {
 	 char *ptrArray = (char *) malloc(ArraySize)  ;
 	 free(ptrArray) ;
   }
-//   unsigned int MyEndTimeB = timeGetTime() ;
-//   timeEndPeriod(1) ;
+  unsigned int MyEndTimeB = timeGetTime() ;
+  timeEndPeriod(1) ;
   std::cerr << "OK" << std::endl ;
 
   std::cerr << "Result for Heap(Array-Test)    : " << 'done4' << " ms" << std::endl ;

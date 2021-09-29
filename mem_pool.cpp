@@ -1,4 +1,5 @@
 #include "mem_pool.h"
+#include <cstring>
 
 namespace MemPool
 {
