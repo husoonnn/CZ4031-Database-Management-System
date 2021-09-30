@@ -39,22 +39,24 @@ int BlockSizeSelect(){
 
 void Experiment1(int blocksize){
 
-    MemoryPool disk(1500,blocksize);
+    MemoryPool disk(int(150000000),blocksize);
 
     std::fstream file;
 
     file.open("data/data.tsv",ios::in);
     if (file.is_open()){
-        std::string tp;
-        while(getline(file,tp)){
+        std::string line;
+        while(getline(file,line)){
             Record r;
-            getline(file,tp,'\t');
-            strcpy(r.tconst,tp.c_str());
-            getline(file,tp,'\t');
-            r.averageRating = std::atof(tp.c_str());
-            getline(file,tp,'\t');
-            r.numVotes = std::atoi(tp.c_str());
+            stringstream linestream(line);
+            string data;
 
+            //assigning temp.tconst value
+            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
+            std::getline(linestream, data, '\t');
+
+            //assigning temp.averageRating & temp.numVotes values
+            linestream >> r.averageRating >> r.numVotes;
             Address address = disk.saveToDisk(&r, sizeof(Record));
         }
         file.close();

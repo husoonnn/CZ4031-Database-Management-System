@@ -43,55 +43,48 @@ bool MemoryPool::CheckBlockSize(std::size_t recordsize){
 Address MemoryPool::AllocateBlock(std:: size_t recordsize){
   //if block size cannot fit new record, create new block
   if (!CheckBlockSize(recordsize)){
-    //create a new block
-    NewBlock();
+
     //if new block cannot be created, exception error 
-    if (!NewBlock()){
-      throw std::logic_error("Failed to allocate new block!");
-    };
-  }; 
+    NewBlock();
+    }
+    short int offset = blocksizeused;
 
-  //insert into the block 
-  // Update variables
-  short int offset = blocksizeused; 
+    //update current block
+    blocksizeused += recordsize;
+    blocksizeleft = blocksize - blocksizeused;
 
-  //do updates 
-  blocksizeused += recordsize;
-  blocksizeleft = blocksize - blocksizeused;
-  //update pointer after insert 
-  block = (char *)block + recordsize;
-
+    //update pointer after insert
+    //block = (char *)block + recordsize;
   // Return the new memory space to put in the record.
   Address recordAddress = {block, offset};
+
   return recordAddress;
 }
 
 //done. 
 //check whether the maxpoolsize is exceeded; if exceeded cannot create new block 
 bool MemoryPool::CheckMaxPool(){
-  if (blocksize + blocksizeused < maxpoolsize){
+  if (blocksize <= poolsizeleft){
+    //std::cout<<"checking1"<<endl;
     return false; 
   }
   else {
+    std::cout<<"Max Pool Size exceeded! Unable to add more blocks"<<endl;
     return true; 
   }
 }
 
 //done. 
-bool MemoryPool::NewBlock(){
+void MemoryPool::NewBlock(){
   //create newblock if we didn't exceed maxpoolsize 
   if (!CheckMaxPool()){
     block = (char *)pool + numofblocks * blocksize; //move pointer to start of new block 
-    blocksizeused += blocksize; //update blocksizeused 
-    blocksizeused = 0; //reset block size used 
+    blocksizeused = 0; //update blocksizeused
+    blocksizeleft = blocksize;
     numofblocks += 1; 
 
-    std::cout << "New block successfully created!" << endl; 
-    return true; 
-  }
-  else {
-    std::cout << "Max Pool Size exceeded! Unable to add more blocks" << endl; 
-    return false; 
+    std::cout << "New block successfully created!" <<numofblocks<< endl; 
+    std::cout<< block <<endl;
   }
 }
 
@@ -103,7 +96,7 @@ void* MemoryPool::loadFromDisk(Address address, std::size_t size)
   std::memcpy(mainMemoryAddress, (char *)address.blockAddress + address.offset, size);
 
   // Update blocks accessed
-  numofblocks++;
+  //numofblocks++;
 
   return mainMemoryAddress;
 }
@@ -115,8 +108,8 @@ Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size)
   std::memcpy((char *)diskAddress.blockAddress + diskAddress.offset, itemAddress, size);
 
   // Update blocks accessed
-  numofblocks++;
-
+  //numofblocks++;
+  std::cout<<(char *)diskAddress.blockAddress+diskAddress.offset<<endl;
   return diskAddress;
 }
 
@@ -126,7 +119,7 @@ Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address disk
   std::memcpy((char *)diskAddress.blockAddress + diskAddress.offset, itemAddress, size);
 
   // Update blocks accessed
-  numofblocks++;
+  //numofblocks++;
 
   return diskAddress;
 }

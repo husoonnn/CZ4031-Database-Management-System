@@ -32,7 +32,7 @@ class MemoryPool {
 
     Address Deallocate();
 
-    bool NewBlock();
+    void NewBlock();
 
     void* loadFromDisk(Address address, std::size_t size);
 
@@ -40,7 +40,7 @@ class MemoryPool {
 
     Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
-    int getNumOfBlocks() const {
+    int getNumOfBlocks(){
       return numofblocks;
     }
 
