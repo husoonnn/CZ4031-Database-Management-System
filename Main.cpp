@@ -12,7 +12,7 @@
 
 using namespace std;
 
-//Get user choice for 100B or 500B
+//get user choice for 100B or 500B
 int BlockSizeSelect(){
 
     int choice=0;
@@ -39,11 +39,13 @@ int BlockSizeSelect(){
 
 void Experiment1(int blocksize){
 
+    //initialize disk storage for memory pool 
     MemoryPool disk(int(150000000),blocksize);
 
+    //read data.tsv file and load into disk storage
     std::fstream file;
 
-    file.open("data/data.tsv",ios::in);
+    file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
         std::string line;
         while(getline(file,line)){
@@ -61,10 +63,8 @@ void Experiment1(int blocksize){
         }
         file.close();
     
-    
-    
     std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
-    std::cout<<"Size of database: "<<endl;
+    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
     }
 }
 
@@ -87,9 +87,6 @@ void Experiment5(){
 int main(){
     
     int blocksize = BlockSizeSelect();
-
-    //allocate by seperating into multiple nodes per block
-
     Experiment1(blocksize);
     //insert function of experiment 2
     //insert function of experiment 3

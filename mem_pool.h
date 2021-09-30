@@ -40,10 +40,29 @@ class MemoryPool {
 
     Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
+
+  //getters 
+    std::size_t getMaxPoolSize(){
+      return maxpoolsize; 
+    }
+    std::size_t getBlockSizeUsed(){
+      return blocksizeused; 
+    }
+    std::size_t getPoolSizeLeft(){
+      return poolsizeleft; 
+    }
+    std::size_t getBlockSizeLegt(){
+      return blocksizeleft; 
+    }
     int getNumOfBlocks(){
       return numofblocks;
     }
-
+    int getBlockSize(){
+      return blocksize; 
+    }
+    std::size_t getSizeOfDatabase(){
+      return numofblocks*blocksize; 
+    }
 };
 
 #endif
