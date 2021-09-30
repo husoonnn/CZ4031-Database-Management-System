@@ -12,7 +12,7 @@
 
 using namespace std;
 
-//Get user choice for 100B or 500B
+//get user choice for 100B or 500B
 int BlockSizeSelect(){
 
     int choice=0;
@@ -37,32 +37,35 @@ int BlockSizeSelect(){
     return 0;
 }
 
-void Fileprocessor(){
+void Experiment1(int blocksize){
 
+    //initialize disk storage for memory pool 
+    MemoryPool disk(int(150000000),blocksize);
+
+    //read data.tsv file and load into disk storage
     std::fstream file;
 
-    file.open("data/data.tsv",ios::in);
+    file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
-        std::string tp;
-        while(getline(file,tp)){
+        std::string line;
+        while(getline(file,line)){
             Record r;
-            getline(file,tp,'\t');
-            strcpy(r.tconst,tp.c_str());
-            getline(file,tp,'\t');
-            r.averageRating = std::atof(tp.c_str());
-            getline(file,tp,'\t');
-            r.numVotes = std::atoi(tp.c_str());
+            stringstream linestream(line);
+            string data;
+
+            //assigning temp.tconst value
+            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
+            std::getline(linestream, data, '\t');
+
+            //assigning temp.averageRating & temp.numVotes values
+            linestream >> r.averageRating >> r.numVotes;
+            Address address = disk.saveToDisk(&r, sizeof(Record));
         }
         file.close();
+    
+    std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
+    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
     }
-}
-
-void Experiment1(int blocksize){
-    
-    MemoryPool disk(150000000,blocksize);
-    
-    std::cout<<"Number of blocks: "<<endl;
-    std::cout<<"Size of database: "<<endl;
 }
 
 void Experiment2(){
@@ -84,13 +87,7 @@ void Experiment5(){
 int main(){
     
     int blocksize = BlockSizeSelect();
-
-    Fileprocessor();
-
-    //allocate by seperating into multiple nodes per block
-    BPTree hello(blocksize, NULL, NULL);
-    
-    // Experiment1(blocksize);
+    Experiment1(blocksize);
     //insert function of experiment 2
     //insert function of experiment 3
     //insert function of experiment 4
