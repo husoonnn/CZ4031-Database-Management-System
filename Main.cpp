@@ -1,6 +1,6 @@
 #include "mem_pool.h"
 #include "types.h"
-
+#include "BPTree.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -88,8 +88,9 @@ int main(){
     Fileprocessor();
 
     //allocate by seperating into multiple nodes per block
-
-    Experiment1(blocksize);
+    BPTree hello(blocksize, NULL, NULL);
+    
+    // Experiment1(blocksize);
     //insert function of experiment 2
     //insert function of experiment 3
     //insert function of experiment 4

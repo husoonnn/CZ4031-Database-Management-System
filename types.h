@@ -1,7 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-// Defines an address of a record stored as a block address with an offset.
+// Defines an address of a record stored as a block address with an offset in the disk.
 struct Address
 {
   void *blockAddress;
