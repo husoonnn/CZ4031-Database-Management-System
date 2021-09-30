@@ -105,7 +105,10 @@ Address MemoryPool::saveToDisk(void *itemAddress, std::size_t size, Address disk
   return diskAddress;
 }
 
-//kiv maybe don;t do deallocation 
-//Address MemoryPool::Deallocate(){
+void MemoryPool::DeallocateRecord(Address address, std::size_t size){
 
-//}
+  //deallocate a record
+  void *addressToDelete = (char *)address.blockAddress + address.offset;
+  std::memset(addressToDelete,'\0',size);
+
+}

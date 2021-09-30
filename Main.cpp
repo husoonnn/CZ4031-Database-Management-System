@@ -64,7 +64,7 @@ void Experiment1(int blocksize){
         file.close();
     
     std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
-    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
+    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" B"<<endl;
     }
 }
 

@@ -40,6 +40,8 @@ class MemoryPool {
 
     Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
 
+    void DeallocateRecord(Address address, std::size_t size);
+
 
   //getters 
     std::size_t getMaxPoolSize(){
