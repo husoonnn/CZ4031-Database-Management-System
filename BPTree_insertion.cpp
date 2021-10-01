@@ -248,6 +248,49 @@ void BPTree::display(Node *cursor) {
   }
 }
 
+// void BPTree::print(Node *cursor){
+//   // pointers[i], int numKeys, const std::string& prefix, const BSTNode* node)
+// {
+//   bool lastKey = false; 
+//   if (cursor != NULL){
+//     for (int i= 0; i<cursor->numKeys; i++){
+      
+//     }
+
+//     if (cursor->isLeaf != true){//not a leaf, call recursive function 
+//       for (int i = 0; i < cursor->pointers[i]){
+//         if (i = cursor->numKeys){
+//             lastKey = true; 
+//           }
+//       }
+//     }
+//   }
+  
+
+//     if( node != nullptr )
+//     {
+//         std::cout << prefix;
+
+//         std::cout << (isLeft ? "├──" : "└──" );
+
+//         // print the value of the node
+//         std::cout << node->m_val << std::endl;
+
+//         // enter the next tree level - left and right branch
+//         printBT( prefix + (isLeft ? "│   " : "    "), node->m_left, true);
+//         printBT( prefix + (isLeft ? "│   " : "    "), node->m_right, false);
+//     }
+// }
+
+// void printBT(const BSTNode* node)
+// {
+//     printBT("", node, false);    
+// }
+
+// // pass the root node of your binary tree
+// printBT(root);
+
+
 // Get the root
 Node *BPTree::getRoot() {
   return root;

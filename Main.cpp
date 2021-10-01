@@ -87,6 +87,7 @@ void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
             //assigning temp.averageRating & temp.numVotes values
             linestream >> r.averageRating >> r.numVotes;
             Address address = disk.saveToDisk(&r, sizeof(Record));
+            std::cout<<address.blockAddress<<endl; 
 
             tree.insert(address,int(r.numVotes));
 
@@ -95,7 +96,7 @@ void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
         }
         file.close();
     }
-    //tree.display(tree.getRoot());
+    tree.display(tree.getRoot());
 }
 
 void Experiment3(){

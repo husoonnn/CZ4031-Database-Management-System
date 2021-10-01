@@ -41,6 +41,7 @@ class BPTree{
         void insert(Address address, int key);
         //Node *findParent(Node *cursor, Node *child);
         void display(Node *cursor);
+        void print(Node *cursor);
         Node *getRoot();
 };
 #endif
