@@ -29,6 +29,7 @@ class BPTree{
         void *rootAddress;  //pointer to root address
         std::size_t nodeSize;
         Node* findParent(Node*,Node*);
+      
 
         //update the parent's index pointer to point at child node 
         void insertInternal(int key, Node* currentDiskAddress, Node* childIndexAddress, Address address);
@@ -48,5 +49,6 @@ class BPTree{
         void displayNode(Node *node);
         void LLdisplay(Node *cursor);
         Node *getRoot();
+        int getHeight();
 };
 #endif

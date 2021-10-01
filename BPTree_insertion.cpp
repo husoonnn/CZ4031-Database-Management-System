@@ -148,13 +148,15 @@ void BPTree::insert(Address address,int key) {
         newRoot->isLeaf = false;
         newRoot->numKeys = 1;
         root = newRoot;
-        std::cout<<"root "<<root<<endl; 
+        // std::cout<<"root "<<root<<endl; 
+        
       } else {
         insertInternal(newLeaf->keys[0], parent, newLeaf, address);
       }
+      height = BPTlevel;
     }
   }
-  std::cout<<"key "<<key<<endl; 
+  // std::cout<<"key "<<key<<endl; 
 }
 
 //inserting a key into the non-leaf node of the tree
@@ -290,6 +292,10 @@ void BPTree::LLdisplay(Node *cursor) {
 // Get the root
 Node *BPTree::getRoot(){
   return root;
+}
+
+int BPTree::getHeight(){
+  return height;
 }
 
 void BPTree::displayNode(Node *node)

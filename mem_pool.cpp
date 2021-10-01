@@ -75,7 +75,7 @@ void MemoryPool::NewBlock(){
     blocksizeleft = blocksize;
     numofblocks += 1; 
 
-    std::cout << "New block " <<numofblocks<< " successfully created!" << endl; 
+    // std::cout << "New block " <<numofblocks<< " successfully created!" << endl; 
   }
 }
 
