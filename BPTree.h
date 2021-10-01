@@ -9,6 +9,7 @@ class Node{
         int numKeys; //number of keys in this node
         int *keys; //store array of keys in the node
         void* storagepointer;
+        void* leafLinkPointer;
         Node** pointers; //{BlockAddress, offset}
         bool isLeaf; //whether this is the leaf node
         friend class BPTree;
@@ -32,15 +33,18 @@ class BPTree{
         //update the parent's index pointer to point at child node 
         void insertInternal(int key, Node* currentDiskAddress, Node* childIndexAddress, Address address);
 
-         //update the parent's index pointer to point at child node  
-        void deleteInternal(int key, Node* currentDiskAddress, Node* childIndexAddress);
+        //  //update the parent's index pointer to point at child node  
+        // void deleteInternal(int key, Node* currentDiskAddress, Node* childIndexAddress);
     
     public:
         int getMaxKeys(std::size_t blocksize); 
         BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index);
         void insert(Address address, int key);
         //Node *findParent(Node *cursor, Node *child);
+        void deleteKey(int key); 
+        void deleteInternal(int key, Node *cursor, Node *child); 
         void display(Node *cursor);
+        void LLdisplay(Node *cursor);
         Node *getRoot();
 };
 #endif

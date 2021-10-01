@@ -49,7 +49,7 @@ void BPTree::insert(Address address,int key) {
 
   //If empty tree, create new node
   if (root == NULL) {
-    Node* root = new Node(maxKeys);
+    root = new Node(maxKeys);
     root->storagepointer = &address; //link index key to storage
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
@@ -93,6 +93,16 @@ void BPTree::insert(Address address,int key) {
 
       Node *newLeaf = new Node(maxKeys); //create new node
       newLeaf->storagepointer = &address;
+      if (cursor->isLeaf){
+        if (cursor->leafLinkPointer == NULL){
+          cursor->leafLinkPointer = newLeaf;
+        }
+        else {
+          void* temp = cursor->leafLinkPointer;
+          newLeaf->leafLinkPointer = temp;
+          cursor->leafLinkPointer = newLeaf;
+        }
+      }
       int virtualNode[MAX+1]; //KIVKIVvivivivii
 
       for (int i = 0; i < maxKeys; i++) { //take in (max keys + 1) keys and store in vir node
@@ -190,7 +200,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
 
     // inserting keys into new node from virtual node
     for (i = 0, j = cursor->numKeys + 1; i < newInternal->numKeys; i++, j++) {
-      newInternal->keys[i] = virtualKey[j]; 
+      newInternal->keys[i] = virtualKey[j];
     }
     
     // inserting pointers into new node from virtual node
@@ -225,7 +235,7 @@ Node *BPTree::findParent(Node *cursor, Node *child) {
       parent = cursor;
       return parent;
     } else {
-      parent = findParent(cursor, child);
+      parent = findParent(cursor->pointers[i], child);
       if (parent != NULL)
         return parent;
     }
@@ -245,6 +255,24 @@ void BPTree::display(Node *cursor) {
         display(cursor->pointers[i]);
       }
     }
+  }
+}
+
+// Print the tree
+void BPTree::LLdisplay(Node *cursor) {
+  if (cursor->isLeaf == true){
+    while (cursor->leafLinkPointer != NULL){
+      for (int i = 0; i < cursor->numKeys; i++) {
+        std::cout<<cursor->keys[i]<<endl;
+      }
+      cursor = (Node *)cursor->leafLinkPointer;
+    }
+    for (int j=0; j<cursor->numKeys; j++){
+      std::cout<<cursor->keys[j]<<endl;
+    }
+  }
+  else{
+    LLdisplay(cursor->pointers[0]);
   }
 }
 
