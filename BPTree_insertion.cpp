@@ -46,6 +46,8 @@ using namespace std;
 
 // Insert Operation
 void BPTree::insert(Address address, int key) {
+  
+  Address addrArray[2];
 
   //If empty tree, create new node
   if (root == NULL) {
@@ -53,30 +55,36 @@ void BPTree::insert(Address address, int key) {
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
     root->numKeys = 1; //New key inserted into new node thus total = 1 key
-    std::cout <<"new root"<<root->keys[0]<< endl; 
+    std::cout <<"new root(first key): "<<root->keys[0]<< endl; 
 
   //If not empty - cursor pt to root block - conduct search top down
   } else {
-    Node *cursor = root;
+    Node *cursor = root; //point cursor to root first
+    std::cout <<"cursor root(first key): "<<cursor->keys[0] << "key: "<<key<< endl; 
     Node *parent;
-    std::cout <<"new cursor"<<cursor->keys[0]<< endl;
     while (cursor->isLeaf == false) { //cursor is at non leaf node
       parent = cursor; //original starting position of parent node
       
       //iterate through records in the block
       for (int i = 0; i <= cursor->numKeys; i++) { 
-        std::cout<<key<<cursor->keys[i]<<endl;
+        std::cout <<"key:"<<key<<" cursor->key[i]: "<<cursor->keys[0]<< endl;
         if (key < cursor->keys[i]) { //comparison of keys
           cursor = (Node *)cursor->pointers[i].blockAddress; //cursor traverse to left block
           break;
         }
         if (i == cursor->numKeys - 1) {
-          cursor = (Node *)cursor->pointers[i+1].blockAddress; //cursor traverse to right block
+          std::cout <<"cursor: "<<cursor<<endl;
+          cursor = ; //cursor traverse to right block ISSUEEEEEEE
+          //cursor = (Node *)cursor->pointers[i+1].blockAddress;
+          std::cout <<"cursor: "<<cursor<<endl;
           break;
         }
       }
     }
+    
+    
     if (cursor->numKeys < maxKeys) { //if block still have space 
+      std::cout <<"enter"<< endl;
       int i = 0;
 
       while (key > cursor->keys[i] && i < cursor->numKeys){ //on same block, compare new key with key in the block & i < total numKeys
@@ -85,31 +93,36 @@ void BPTree::insert(Address address, int key) {
 
       for (int j = cursor->numKeys; j > i; j--) {
         cursor->keys[j] = cursor->keys[j - 1]; //shifting keys, larger than new key, right by 1 position
+        std::cout <<"upon shift - keys[j-1]: "<<cursor->keys[j-1]<< endl;
+        std::cout <<"upon shift - keys[j]: "<<cursor->keys[j]<< endl;
         cursor->pointers[j] = cursor->pointers[j-1]; //shifting pointers
       }
 
       cursor->keys[i] = key; //insert key i th position
+      std::cout <<"upon inserting - keys[i]: "<<cursor->keys[i]<< endl;
       cursor->numKeys++; //update numKeys
     
     }else{ //if block no space
 
       Node *newLeaf = new Node(maxKeys); //create new node
-      int virtualNode[MAX + 1]; //KIVKIVvivivivii
+      std::cout <<"new node numKeys: "<<newLeaf->numKeys<<endl;
+      int virtualNode[MAX + 1]; //KIVKIVvivivivii MAX 
 
       for (int i = 0; i < maxKeys; i++) { //take in (max keys + 1) keys and store in vir node
         virtualNode[i] = cursor->keys[i];
       }
 
       int i = 0, j;
-
       while (key > virtualNode[i] && i < maxKeys){ //finding position to slot in new key
         i++;
       }
-      for (int j = maxKeys + 1; j > i; j--) { //moving keys that are larger 
+      for (int j = maxKeys; j > i; j--) { //moving keys that are larger 
         virtualNode[j] = virtualNode[j - 1];
+        std::cout <<"virnode[j]: "<<virtualNode[j]<<" virnode[j-1]"<<virtualNode[j-1] <<endl;
       }
 
       virtualNode[i] = key;  //insert new key into position i
+      std::cout <<"virnode[i]: "<<virtualNode[i] <<endl;
       newLeaf->isLeaf = true;
       cursor->numKeys = (maxKeys + 1) / 2; //splitting keys into 2 nodes 
       newLeaf->numKeys = maxKeys + 1 - (maxKeys + 1) / 2; //newleaf should contain behind half nodes 
@@ -120,12 +133,16 @@ void BPTree::insert(Address address, int key) {
       //rearranging the 2 leaf nodes 
       for (i = 0; i < cursor->numKeys; i++) {
         cursor->keys[i] = virtualNode[i];
+        std::cout <<"node 1: "<<cursor->keys[i]<<endl;
       }
       for (i = 0, j = cursor->numKeys; i < newLeaf->numKeys; i++, j++) {
         newLeaf->keys[i] = virtualNode[j];
+        std::cout <<"node 2: "<<newLeaf->keys[i]<<endl;
       }
 
       //KIVIVIVIVIV
+      std::cout <<"cursor: "<<cursor<<" root: "<<root<<endl;
+      std::cout <<"cursor key: "<<cursor->keys[0]<<endl;
       if (cursor == root) {
         Node *newRoot = new Node(maxKeys);
         newRoot->keys[0] = newLeaf->keys[0];
