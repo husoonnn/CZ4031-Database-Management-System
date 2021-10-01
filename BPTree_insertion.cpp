@@ -93,6 +93,16 @@ void BPTree::insert(Address address,int key) {
     }else{ //if block no space
       Node *newLeaf = new Node(maxKeys); //create new node
       newLeaf->storagepointer = &address;
+      if (cursor->isLeaf){
+        if (cursor->leafLinkPointer == NULL){
+          cursor->leafLinkPointer = newLeaf;
+        }
+        else {
+          void* temp = cursor->leafLinkPointer;
+          newLeaf->leafLinkPointer = temp;
+          cursor->leafLinkPointer = newLeaf;
+        }
+      }
       int virtualNode[MAX+1]; //KIVKIVvivivivii
 
       for (int i = 0; i < maxKeys; i++) { //take in (max keys + 1) keys and store in vir node
@@ -193,7 +203,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
 
     // inserting keys into new node from virtual node
     for (i = 0, j = cursor->numKeys + 1; i < newInternal->numKeys; i++, j++) {
-      newInternal->keys[i] = virtualKey[j]; 
+      newInternal->keys[i] = virtualKey[j];
     }
     
     // inserting pointers into new node from virtual node
@@ -259,49 +269,23 @@ void BPTree::display(Node *cursor) {
   }
 }
 
-
-// void BPTree::print(Node *cursor){
-//   // pointers[i], int numKeys, const std::string& prefix, const BSTNode* node)
-// {
-//   bool lastKey = false; 
-//   if (cursor != NULL){
-//     for (int i= 0; i<cursor->numKeys; i++){
-      
-//     }
-
-//     if (cursor->isLeaf != true){//not a leaf, call recursive function depth first 
-//       for (int i = 0; i < cursor->pointers[i]; i++){
-//         if (i = cursor->numKeys){
-//             lastKey = true; 
-//           }
-//       }
-//     }
-//   }
-  
-
-//     if( node != nullptr )
-//     {
-//         std::cout << prefix;
-
-//         std::cout << (isLeft ? "├──" : "└──" );
-
-//         // print the value of the node
-//         std::cout << node->m_val << std::endl;
-
-//         // enter the next tree level - left and right branch
-//         printBT( prefix + (isLeft ? "│   " : "    "), node->m_left, true);
-//         printBT( prefix + (isLeft ? "│   " : "    "), node->m_right, false);
-//     }
-// }
-
-// void printBT(const BSTNode* node)
-// {
-//     printBT("", node, false);    
-// }
-
-// // pass the root node of your binary tree
-// printBT(root);
-
+// Print the tree
+void BPTree::LLdisplay(Node *cursor) {
+  if (cursor->isLeaf == true){
+    while (cursor->leafLinkPointer != NULL){
+      for (int i = 0; i < cursor->numKeys; i++) {
+        std::cout<<cursor->keys[i]<<endl;
+      }
+      cursor = (Node *)cursor->leafLinkPointer;
+    }
+    for (int j=0; j<cursor->numKeys; j++){
+      std::cout<<cursor->keys[j]<<endl;
+    }
+  }
+  else{
+    LLdisplay(cursor->pointers[0]);
+  }
+}
 
 // Get the root
 Node *BPTree::getRoot(){

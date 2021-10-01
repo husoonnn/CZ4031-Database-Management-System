@@ -9,6 +9,7 @@ using namespace std;
 Node::Node(int maxKeys){
     keys = new int[maxKeys];
     pointers = new Node*[maxKeys+1];
+    leafLinkPointer = NULL;
 
     //int i = 0;
     //while(i<maxKeys + 1){
