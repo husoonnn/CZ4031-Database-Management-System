@@ -1,6 +1,5 @@
 #include "BPTree.h"
 #include "types.h"
-#include "mem_pool.h"
 
 #include <vector>
 #include <cstring>

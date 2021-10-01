@@ -25,7 +25,7 @@ class BPTree{
         MemoryPool *disk;   //pointer pointing to memory pool for data block
         MemoryPool *index;  //pointer pointing to memory pool for index
         Node *root;         //pointer to root node
-        //void *rootAddress;  //pointer to root address
+        void *rootAddress;  //pointer to root address
         std::size_t nodeSize;
         Node* findParent(Node*,Node*);
 

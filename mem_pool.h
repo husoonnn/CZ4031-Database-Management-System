@@ -2,7 +2,6 @@
 #define MEMORY_POOL_H
 
 #include "types.h"
-#include "BPTree.h"
 
 #include <vector>
 #include <unordered_map>
