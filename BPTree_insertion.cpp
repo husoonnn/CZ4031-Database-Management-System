@@ -6,6 +6,7 @@
 #include <iostream>
 
 int const MAX = 3;
+int BPTlevel = 1;
 
 using namespace std;
 
@@ -49,7 +50,7 @@ void BPTree::insert(Address address,int key) {
 
   //If empty tree, create new node
   if (root == NULL) {
-    Node* root = new Node(maxKeys);
+    root = new Node(maxKeys);
     root->storagepointer = &address; //link index key to storage
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
@@ -90,7 +91,6 @@ void BPTree::insert(Address address,int key) {
       cursor->pointers[cursor->numKeys-1]=NULL;
     
     }else{ //if block no space
-
       Node *newLeaf = new Node(maxKeys); //create new node
       newLeaf->storagepointer = &address;
       int virtualNode[MAX+1]; //KIVKIVvivivivii
@@ -129,6 +129,7 @@ void BPTree::insert(Address address,int key) {
 
       //KIVIVIVIVIV
       if (cursor == root) {
+        BPTlevel += 1;
         Node *newRoot = new Node(maxKeys);
         newRoot->storagepointer = &address;
         newRoot->keys[0] = newLeaf->keys[0];
@@ -137,11 +138,13 @@ void BPTree::insert(Address address,int key) {
         newRoot->isLeaf = false;
         newRoot->numKeys = 1;
         root = newRoot;
+        std::cout<<"root "<<root<<endl; 
       } else {
         insertInternal(newLeaf->keys[0], parent, newLeaf, address);
       }
     }
   }
+  std::cout<<"key "<<key<<endl; 
 }
 
 //inserting a key into the non-leaf node of the tree
@@ -175,7 +178,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
     }
     int i = 0, j;
     while (key > virtualKey[i] && i < MAX) //traversing virtual array to insert key
-      i++;
+      i++; 
     for (int j = MAX + 1; j > i; j--) { //shifting keys greater than key to the right
       virtualKey[j] = virtualKey[j - 1];
     }
@@ -198,6 +201,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
       newInternal->pointers[i] = virtualPtr[j];
     }
     if (cursor == root) {
+      BPTlevel += 1;
       Node *newRoot = new Node(maxKeys);
       newRoot->storagepointer = &address;
       newRoot->keys[0] = cursor->keys[cursor->numKeys];
@@ -225,7 +229,7 @@ Node *BPTree::findParent(Node *cursor, Node *child) {
       parent = cursor;
       return parent;
     } else {
-      parent = findParent(cursor, child);
+      parent = findParent(cursor->pointers[i], child);
       if (parent != NULL)
         return parent;
     }
@@ -237,7 +241,13 @@ Node *BPTree::findParent(Node *cursor, Node *child) {
 void BPTree::display(Node *cursor) {
   if (cursor != NULL) {
     for (int i = 0; i < cursor->numKeys; i++) {
-      cout << cursor->keys[i] << " ";
+      cout << cursor->keys[i] << " | ";
+    }
+    if (cursor->numKeys == 1){
+      cout << "X" << " | " << "X" << " | ";
+    }
+    else if (cursor->numKeys == 2){
+      cout << "X" << " | ";
     }
     cout << "\n";
     if (cursor->isLeaf != true) {
@@ -245,8 +255,10 @@ void BPTree::display(Node *cursor) {
         display(cursor->pointers[i]);
       }
     }
+    //cout << "Tree level: " << BPTlevel <<endl;
   }
 }
+
 
 // void BPTree::print(Node *cursor){
 //   // pointers[i], int numKeys, const std::string& prefix, const BSTNode* node)
@@ -257,8 +269,8 @@ void BPTree::display(Node *cursor) {
       
 //     }
 
-//     if (cursor->isLeaf != true){//not a leaf, call recursive function 
-//       for (int i = 0; i < cursor->pointers[i]){
+//     if (cursor->isLeaf != true){//not a leaf, call recursive function depth first 
+//       for (int i = 0; i < cursor->pointers[i]; i++){
 //         if (i = cursor->numKeys){
 //             lastKey = true; 
 //           }
@@ -292,6 +304,28 @@ void BPTree::display(Node *cursor) {
 
 
 // Get the root
-Node *BPTree::getRoot() {
+Node *BPTree::getRoot(){
   return root;
+}
+
+void BPTree::displayNode(Node *node)
+{
+  int i = 0;
+  std::cout << "|";
+  for (int i = 0; i < node->numKeys; i++)
+  {
+    std::cout << node->keys[i] << " | ";
+  }
+
+  
+  for (int i = node->numKeys; i < maxKeys; i++)
+  {
+    std::cout << " x |";      // Remaining empty keys
+  }
+
+  if (node->isLeaf != true) {
+      for (int i = 0; i < node->numKeys + 1; i++) {
+        display(node->pointers[i]);
+      }
+  }
 }

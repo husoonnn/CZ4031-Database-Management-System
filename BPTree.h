@@ -9,7 +9,7 @@ class Node{
         int numKeys; //number of keys in this node
         int *keys; //store array of keys in the node
         void* storagepointer;
-        Node** pointers; //{BlockAddress, offset}
+        Node** pointers; 
         bool isLeaf; //whether this is the leaf node
         friend class BPTree;
     
@@ -42,6 +42,7 @@ class BPTree{
         //Node *findParent(Node *cursor, Node *child);
         void display(Node *cursor);
         void print(Node *cursor);
+        void displayNode(Node *node);
         Node *getRoot();
 };
 #endif
