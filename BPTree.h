@@ -34,7 +34,8 @@ class BPTree{
         void deleteInternal(int key, Node* currentDiskAddress, Node* childIndexAddress);
     
     public:
-    int getMaxKeys(std::size_t blocksize); 
-    BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index);
+        int getMaxKeys(std::size_t blocksize); 
+        BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index);
+        void insert(Address address, int key);
 };
 #endif
