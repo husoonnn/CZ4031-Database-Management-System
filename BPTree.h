@@ -37,5 +37,8 @@ class BPTree{
         int getMaxKeys(std::size_t blocksize); 
         BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index);
         void insert(Address address, int key);
+        Node *findParent(Node *cursor, Node *child);
+        void display(Node *cursor);
+        Node *getRoot();
 };
 #endif

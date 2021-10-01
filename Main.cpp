@@ -37,11 +37,8 @@ int BlockSizeSelect(){
     return 0;
 }
 
-void Experiment1(int blocksize){
-
-    //initialize disk storage for memory pool 
-    MemoryPool disk(int(150000000),blocksize);
-
+void Experiment1(int blocksize,MemoryPool disk, MemoryPool index){
+    
     //read data.tsv file and load into disk storage
     std::fstream file;
 
@@ -60,6 +57,7 @@ void Experiment1(int blocksize){
             //assigning temp.averageRating & temp.numVotes values
             linestream >> r.averageRating >> r.numVotes;
             Address address = disk.saveToDisk(&r, sizeof(Record));
+
         }
         file.close();
     
@@ -68,8 +66,33 @@ void Experiment1(int blocksize){
     }
 }
 
-void Experiment2(){
+void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
+    BPTree tree = BPTree(blocksize,&disk,&index);
 
+    //read data.tsv file and load into disk storage
+    std::fstream file;
+
+    file.open("data/testdata.tsv",ios::in);
+    if (file.is_open()){
+        std::string line;
+        while(getline(file,line)){
+            Record r;
+            stringstream linestream(line);
+            string data;
+            
+            //assigning temp.tconst value
+            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
+            std::getline(linestream, data, '\t');
+
+            //assigning temp.averageRating & temp.numVotes values
+            linestream >> r.averageRating >> r.numVotes;
+            Address address = disk.saveToDisk(&r, sizeof(Record));
+
+            tree.insert(address, int(r.numVotes));
+        }
+        file.close();
+    }
+    tree.display(tree.getRoot());
 }
 
 void Experiment3(){
@@ -85,10 +108,15 @@ void Experiment5(){
 }
 
 int main(){
-    
+
     int blocksize = BlockSizeSelect();
-    Experiment1(blocksize);
-    //insert function of experiment 2
+
+    //initialize disk storage for memory pool 
+    MemoryPool disk(int(150000000),blocksize);
+    MemoryPool index(int(300000000),blocksize);
+
+    // Experiment1(blocksize,disk,index);
+    Experiment2(blocksize,disk,index);
     //insert function of experiment 3
     //insert function of experiment 4
     //insert function of experiment 5

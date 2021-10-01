@@ -53,17 +53,20 @@ void BPTree::insert(Address address, int key) {
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
     root->numKeys = 1; //New key inserted into new node thus total = 1 key
+    std::cout <<"new root"<<root->keys[0]<< endl; 
 
   //If not empty - cursor pt to root block - conduct search top down
   } else {
     Node *cursor = root;
     Node *parent;
+    std::cout <<"new cursor"<<cursor->keys[0]<< endl;
     while (cursor->isLeaf == false) { //cursor is at non leaf node
       parent = cursor; //original starting position of parent node
       
       //iterate through records in the block
-      for (int i = 0; i < cursor->numKeys; i++) { 
-        if (key < cursor->keys[i]) { //comparison of keys 
+      for (int i = 0; i <= cursor->numKeys; i++) { 
+        std::cout<<key<<cursor->keys[i]<<endl;
+        if (key < cursor->keys[i]) { //comparison of keys
           cursor = (Node *)cursor->pointers[i].blockAddress; //cursor traverse to left block
           break;
         }
@@ -113,7 +116,7 @@ void BPTree::insert(Address address, int key) {
 
       cursor->pointers[cursor->numKeys] = newLeaf->pointers[0]; //pointing to first pointer of new leaf node 
       newLeaf->pointers[newLeaf->numKeys] = cursor->pointers[maxKeys]; //
-      cursor->pointers[maxKeys] = NULL; 
+      // cursor->pointers[maxKeys] = NULL; 
       //rearranging the 2 leaf nodes 
       for (i = 0; i < cursor->numKeys; i++) {
         cursor->keys[i] = virtualNode[i];
@@ -121,6 +124,8 @@ void BPTree::insert(Address address, int key) {
       for (i = 0, j = cursor->numKeys; i < newLeaf->numKeys; i++, j++) {
         newLeaf->keys[i] = virtualNode[j];
       }
+
+      //KIVIVIVIVIV
       if (cursor == root) {
         Node *newRoot = new Node(maxKeys);
         newRoot->keys[0] = newLeaf->keys[0];
@@ -136,60 +141,68 @@ void BPTree::insert(Address address, int key) {
   }
 }
 
-void BPTree::insertInternal(int x, Node *cursor, Node *child) {
-  if (cursor->size < MAX) {
+//inserting a key into the non-leaf node of the tree
+void BPTree::insertInternal(int key, Node *cursor, Node *child) {
+  //if got space for insertion
+  if (cursor->numKeys < MAX) {
     int i = 0;
-    while (x > cursor->key[i] && i < cursor->size)
+    while (key > cursor->keys[i] && i < cursor->numKeys)//traverse block
       i++;
-    for (int j = cursor->size; j > i; j--) {
-      cursor->key[j] = cursor->key[j - 1];
+    for (int j = cursor->numKeys; j > i; j--) { //shifting keys larger than key to the right
+      cursor->keys[j] = cursor->keys[j - 1];
     }
-    for (int j = cursor->size + 1; j > i + 1; j--) {
-      cursor->ptr[j] = cursor->ptr[j - 1];
+    for (int j = cursor->numKeys + 1; j > i + 1; j--) { //shifting pointers to the right 
+      cursor->pointers[j] = cursor->pointers[j - 1];
     }
-    cursor->key[i] = x;
-    cursor->size++;
-    cursor->ptr[i + 1] = child;
-  } else {
-    Node *newInternal = new Node;
+    cursor->keys[i] = key; //key inserted 
+    cursor->numKeys++;
+    //assign empty pointer to new child node 
+    cursor->pointers[i + 1] = child->pointers[0]; //KIV
+  }
+   else { //if parent node is already full, go through split using virtual array block
+    Node *newInternal = new Node(maxKeys);
     int virtualKey[MAX + 1];
-    Node *virtualPtr[MAX + 2];
-    for (int i = 0; i < MAX; i++) {
-      virtualKey[i] = cursor->key[i];
+    Address virtualPtr[MAX + 2];
+    for (int i = 0; i < MAX; i++) { //adding current keys to virtualkey array
+      virtualKey[i] = cursor->keys[i];
     }
     for (int i = 0; i < MAX + 1; i++) {
-      virtualPtr[i] = cursor->ptr[i];
+      virtualPtr[i] = cursor->pointers[i]; //adding current pointers to virtual array
     }
     int i = 0, j;
-    while (x > virtualKey[i] && i < MAX)
+    while (key > virtualKey[i] && i < MAX) //traversing virtual array to insert key
       i++;
-    for (int j = MAX + 1; j > i; j--) {
+    for (int j = MAX + 1; j > i; j--) { //shifting keys greater than key to the right
       virtualKey[j] = virtualKey[j - 1];
     }
-    virtualKey[i] = x;
-    for (int j = MAX + 2; j > i + 1; j--) {
+    virtualKey[i] = key; //insert key
+    for (int j = MAX + 2; j > i + 1; j--) {  //shifting pointers to the right
       virtualPtr[j] = virtualPtr[j - 1];
     }
-    virtualPtr[i + 1] = child;
-    newInternal->IS_LEAF = false;
-    cursor->size = (MAX + 1) / 2;
-    newInternal->size = MAX - (MAX + 1) / 2;
-    for (i = 0, j = cursor->size + 1; i < newInternal->size; i++, j++) {
-      newInternal->key[i] = virtualKey[j];
+    virtualPtr[i + 1] = child->pointers[0]; //assign pointer to new child node
+    newInternal->isLeaf = false; //non-leaf
+    cursor->numKeys = (MAX + 1) / 2; //splitting parent node into two child nodes
+    newInternal->numKeys = MAX - (MAX + 1) / 2; 
+
+    // inserting keys into new node from virtual node
+    for (i = 0, j = cursor->numKeys + 1; i < newInternal->numKeys; i++, j++) {
+      newInternal->keys[i] = virtualKey[j]; 
     }
-    for (i = 0, j = cursor->size + 1; i < newInternal->size + 1; i++, j++) {
-      newInternal->ptr[i] = virtualPtr[j];
+    
+    // inserting pointers into new node from virtual node
+    for (i = 0, j = cursor->numKeys + 1; i < newInternal->numKeys + 1; i++, j++) {
+      newInternal->pointers[i] = virtualPtr[j];
     }
     if (cursor == root) {
-      Node *newRoot = new Node;
-      newRoot->key[0] = cursor->key[cursor->size];
-      newRoot->ptr[0] = cursor;
-      newRoot->ptr[1] = newInternal;
-      newRoot->IS_LEAF = false;
-      newRoot->size = 1;
+      Node *newRoot = new Node(maxKeys);
+      newRoot->keys[0] = cursor->keys[cursor->numKeys];
+      newRoot->pointers[0] = cursor->pointers[0]; //point to left child
+      newRoot->pointers[1] = newInternal->pointers[0]; //point to right child
+      newRoot->isLeaf = false;
+      newRoot->numKeys = 1;
       root = newRoot;
     } else {
-      insertInternal(cursor->key[cursor->size], findParent(root, cursor), newInternal);
+      insertInternal(cursor->keys[cursor->numKeys], findParent(root, cursor), newInternal);
     }
   }
 }
@@ -197,15 +210,18 @@ void BPTree::insertInternal(int x, Node *cursor, Node *child) {
 // Find the parent
 Node *BPTree::findParent(Node *cursor, Node *child) {
   Node *parent;
-  if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF) {
+  //if parent or child is leaf
+  if (cursor->isLeaf || child->isLeaf) { //KIVIVIVIVIIVIV
     return NULL;
   }
-  for (int i = 0; i < cursor->size + 1; i++) {
-    if (cursor->ptr[i] == child) {
+  //traverse node to find the parent using recursive function
+  for (int i = 0; i < cursor->numKeys + 1; i++) {
+    if (&cursor->pointers[i] == &child->pointers[i]) { //comparing addresses of parent and child
       parent = cursor;
       return parent;
     } else {
-      parent = findParent(cursor->ptr[i], child);
+      cursor = (Node *)(cursor->pointers[i]).blockAddress; 
+      parent = findParent(cursor, child);
       if (parent != NULL)
         return parent;
     }
@@ -216,13 +232,13 @@ Node *BPTree::findParent(Node *cursor, Node *child) {
 // Print the tree
 void BPTree::display(Node *cursor) {
   if (cursor != NULL) {
-    for (int i = 0; i < cursor->size; i++) {
-      cout << cursor->key[i] << " ";
+    for (int i = 0; i < cursor->numKeys; i++) {
+      cout << cursor->keys[i] << " ";
     }
     cout << "\n";
-    if (cursor->IS_LEAF != true) {
-      for (int i = 0; i < cursor->size + 1; i++) {
-        display(cursor->ptr[i]);
+    if (cursor->isLeaf != true) {
+      for (int i = 0; i < cursor->numKeys + 1; i++) {
+        display((Node *)(cursor->pointers[i]).blockAddress);
       }
     }
   }
@@ -232,15 +248,3 @@ void BPTree::display(Node *cursor) {
 Node *BPTree::getRoot() {
   return root;
 }
-
-// void BPTree::Search(){
-
-// }
-
-// void BPTree::blockSpaceCheck(){
-
-// }
-
-// void BPTree::balacingcheck(){
-
-// }

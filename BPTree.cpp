@@ -14,6 +14,7 @@ Node::Node(int maxKeys){
     while(i<maxKeys + 1){
         Address nullAddress{(void *) NULL, 0}; // KIVIVIVIVIVIVIV Generate a block and allocate to pointer
         pointers[i] = nullAddress; //initialize pointer
+        i+=1;
     }
   numKeys = 0;
 }
@@ -42,7 +43,7 @@ BPTree::BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index){
     std::cout<< maxKeys << endl;
     //Initialize root to NULL
     rootAddress = nullptr;
-    root = nullptr;
+    root = NULL;
 
     // Set node size to be equal to block size.
     //nodeSize = blockSize; KIVIVIVIVIVIVIVIVIVIVIVIVIV
