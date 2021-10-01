@@ -2,6 +2,7 @@
 #define MEMORY_POOL_H
 
 #include "types.h"
+#include "BPTree.h"
 
 #include <vector>
 #include <unordered_map>
@@ -38,7 +39,8 @@ class MemoryPool {
 
     Address saveToDisk(void *itemAddress, std::size_t size); 
 
-    Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress); 
+    Address saveToDisk(void *itemAddress, std::size_t size, Address diskAddress);
+
 
 
   //getters 

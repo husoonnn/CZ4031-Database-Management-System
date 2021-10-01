@@ -88,11 +88,14 @@ void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
             linestream >> r.averageRating >> r.numVotes;
             Address address = disk.saveToDisk(&r, sizeof(Record));
 
-            tree.insert(address, int(r.numVotes));
+            tree.insert(address,int(r.numVotes));
+
+            //tree.display(tree.getRoot());
+            //std::cout<<"next"<<"\n";
         }
         file.close();
     }
-    tree.display(tree.getRoot());
+    //tree.display(tree.getRoot());
 }
 
 void Experiment3(){
@@ -112,8 +115,8 @@ int main(){
     int blocksize = BlockSizeSelect();
 
     //initialize disk storage for memory pool 
-    MemoryPool disk(int(150000000),blocksize);
-    MemoryPool index(int(300000000),blocksize);
+    MemoryPool disk(150000000,blocksize);
+    MemoryPool index(300000000,blocksize);
 
     // Experiment1(blocksize,disk,index);
     Experiment2(blocksize,disk,index);

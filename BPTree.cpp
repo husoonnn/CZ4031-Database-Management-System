@@ -8,14 +8,14 @@ using namespace std;
 
 Node::Node(int maxKeys){
     keys = new int[maxKeys];
-    pointers = new Address[maxKeys+1];
+    pointers = new Node*[maxKeys+1];
 
-    int i = 0;
-    while(i<maxKeys + 1){
-        Address nullAddress{(void *) NULL, 0}; // KIVIVIVIVIVIVIV Generate a block and allocate to pointer
-        pointers[i] = nullAddress; //initialize pointer
-        i+=1;
-    }
+    //int i = 0;
+    //while(i<maxKeys + 1){
+        //Address nullAddress{(void *) NULL, 0}; // KIVIVIVIVIVIVIV Generate a block and allocate to pointer
+        //pointers[i] = nullAddress; //initialize pointer
+        //i+=1;
+    //}
   numKeys = 0;
 }
 
@@ -42,7 +42,7 @@ BPTree::BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index){
     maxKeys = getMaxKeys(blocksize);
     std::cout<< maxKeys << endl;
     //Initialize root to NULL
-    rootAddress = nullptr;
+    //rootAddress = nullptr;
     root = NULL;
 
     // Set node size to be equal to block size.
