@@ -1,0 +1,2 @@
+Number of blocks: 20
+Size of database: 2000 MB

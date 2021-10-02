@@ -1,0 +1,4 @@
+Parameter n of the tree is: 3
+Number of nodes of the B+ tree: 
+Height of B+ tree is: 5
+Content of root node and it's first child node: 

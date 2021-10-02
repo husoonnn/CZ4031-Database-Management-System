@@ -41,7 +41,6 @@ int BPTree::getMaxKeys(std::size_t blocksize){
 BPTree::BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index){
 
     maxKeys = getMaxKeys(blocksize);
-    std::cout<< maxKeys << endl;
     //Initialize root to NULL
     //rootAddress = nullptr;
     root = NULL;

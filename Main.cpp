@@ -147,13 +147,24 @@ int main(){
 
     int blocksize = BlockSizeSelect();
 
+    streambuf *coutbuf = std::cout.rdbuf(); //save old buffer
+
+    // save experiment1 logging
+    ofstream out1("outputs/experiment1_" + to_string(blocksize) + "B.txt");
+    std::cout.rdbuf(out1.rdbuf()); 
+
     //initialize disk storage for memory pool 
     MemoryPool disk(150000000,blocksize);
     MemoryPool index(300000000,blocksize);
 
+    //construct 
     BPTree tree = BPTree(blocksize,&disk,&index);
+
+    //file creation
     std::fstream file;
 
+    //datasets
+    //file.open("data/data.tsv",ios::in);
     file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
         std::string line;
@@ -179,15 +190,23 @@ int main(){
     //Experiment 1
     std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
     std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
-    
+
+    std::cout.rdbuf(coutbuf);
+
+    ofstream out2("outputs/experiment2_" + to_string(blocksize) + "B.txt");
+    std::cout.rdbuf(out2.rdbuf()); 
     // Experiment2(blocksize,disk,index);
     std::cout<<"Parameter n of the tree is: "<<tree.getMaxKeys(blocksize)<<endl;
     std::cout<<"Number of nodes of the B+ tree: "<<endl;
     std::cout<<"Height of B+ tree is: "<<tree.getHeight()<<endl;
     // tree.displayNode();
     std::cout<<"Content of root node and it's first child node: "<<endl;
+
+    std::cout.rdbuf(coutbuf);
     //insert function of experiment 3
+    
     //insert function of experiment 4
+    
     // Experiment5(blocksize,disk,index);
 
     //repeat experiment(Y/N)
