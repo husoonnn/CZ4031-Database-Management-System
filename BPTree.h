@@ -8,7 +8,7 @@ class Node{
     private:
         int numKeys; //number of keys in this node
         int *keys; //store array of keys in the node
-        void* storagepointer;
+        Address *storagepointer;
         void* leafLinkPointer;
         Node** pointers; //{BlockAddress, offset}
         bool isLeaf; //whether this is the leaf node
@@ -47,7 +47,9 @@ class BPTree{
         void display(Node *cursor);
         void print(Node *cursor);
         void displayNode(Node *node);
+        void displayKeys(Node *node);
         void LLdisplay(Node *cursor);
+        bool search(Node *cursor, int lowerboundkey, int upperboundkey);
         Node *getRoot();
         int getHeight();
         int getnumNodes();

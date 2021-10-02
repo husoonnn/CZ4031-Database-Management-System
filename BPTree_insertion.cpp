@@ -52,7 +52,7 @@ void BPTree::insert(Address address,int key) {
   if (root == NULL) {
     root = new Node(maxKeys);
     numNodes += 1;
-    root->storagepointer = &address; //link index key to storage
+    root->storagepointer[0] = address; //link index key to storage
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
     root->numKeys = 1; //New key inserted into new node thus total = 1 key
@@ -87,6 +87,7 @@ void BPTree::insert(Address address,int key) {
       }
 
       cursor->keys[i] = key; //insert key i th position
+      cursor->storagepointer[i] = address;
       cursor->numKeys++; //update numKeys
       cursor->pointers[cursor->numKeys] = cursor->pointers[cursor->numKeys-1]; //shifting pointers
       cursor->pointers[cursor->numKeys-1]=NULL;
@@ -94,7 +95,6 @@ void BPTree::insert(Address address,int key) {
     }else{ //if block no space
       Node *newLeaf = new Node(maxKeys); //create new node
       numNodes += 1;
-      newLeaf->storagepointer = &address;
       if (cursor->isLeaf){
         if (cursor->leafLinkPointer == NULL){
           cursor->leafLinkPointer = newLeaf;
@@ -123,6 +123,7 @@ void BPTree::insert(Address address,int key) {
 
 
       virtualNode[i] = key;  //insert new key into position i
+      int temp_position = i;
       newLeaf->isLeaf = true;
       cursor->numKeys = (maxKeys + 1) / 2; //splitting keys into 2 nodes 
       newLeaf->numKeys = maxKeys + 1 - (maxKeys + 1) / 2; //newleaf should contain behind half nodes 
@@ -134,9 +135,15 @@ void BPTree::insert(Address address,int key) {
       //rearranging the 2 leaf nodes 
       for (i = 0; i < cursor->numKeys; i++) {
         cursor->keys[i] = virtualNode[i];
+        if (temp_position == i){
+          cursor->storagepointer[i] = address;
+        }
       }
       for (i = 0, j = cursor->numKeys; i < newLeaf->numKeys; i++, j++) {
         newLeaf->keys[i] = virtualNode[j];
+        if (temp_position == j){
+          cursor->storagepointer[j] = address;
+        }
       }
 
       //KIVIVIVIVIV
@@ -144,7 +151,6 @@ void BPTree::insert(Address address,int key) {
         BPTlevel += 1;
         Node *newRoot = new Node(maxKeys);
         numNodes += 1;
-        newRoot->storagepointer = &address;
         newRoot->keys[0] = newLeaf->keys[0];
         newRoot->pointers[0] = cursor;
         newRoot->pointers[1] = newLeaf;
@@ -178,6 +184,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
       cursor->pointers[j] = cursor->pointers[j - 1];
     }
     cursor->keys[i] = key; //key inserted 
+    cursor->storagepointer[i] = address;
     cursor->numKeys++;
     //assign empty pointer to new child node 
     cursor->pointers[i + 1] = child; //KIV
@@ -185,7 +192,6 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
    else { //if parent node is already full, go through split using virtual array block
     Node *newInternal = new Node(maxKeys);
     numNodes += 1;
-    newInternal->storagepointer = &address;
     int virtualKey[MAX + 1];
     Node* virtualPtr[MAX + 2];
     for (int i = 0; i < MAX; i++) { //adding current keys to virtualkey array
@@ -222,7 +228,6 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
       BPTlevel += 1;
       Node *newRoot = new Node(maxKeys);
       numNodes += 1;
-      newRoot->storagepointer = &address;
       newRoot->keys[0] = cursor->keys[cursor->numKeys];
       newRoot->pointers[0] = cursor; //point to left child
       newRoot->pointers[1] = newInternal; //point to right child
@@ -283,12 +288,12 @@ void BPTree::LLdisplay(Node *cursor) {
   if (cursor->isLeaf == true){
     while (cursor->leafLinkPointer != NULL){
       for (int i = 0; i < cursor->numKeys; i++) {
-        std::cout<<cursor->keys[i]<<endl;
+        std::cout<<cursor->storagepointer[i].blockAddress<<endl;
       }
       cursor = (Node *)cursor->leafLinkPointer;
     }
     for (int j=0; j<cursor->numKeys; j++){
-      std::cout<<cursor->keys[j]<<endl;
+      std::cout<<cursor->storagepointer[j].blockAddress<<endl;
     }
   }
   else{
@@ -309,6 +314,53 @@ int BPTree::getHeight(){
   return height;
 }
 
+bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
+
+  bool search_result;
+
+  // if leaf nodes not reach, recursively traverse the b+ tree
+  if (cursor->isLeaf != true){
+    for(int i=0; i < cursor->numKeys + 1; i++){
+      if (cursor->pointers[i] != NULL){
+        search_result = search(cursor->pointers[i],lowerboundkey,upperboundkey);
+        if (search_result == true){
+          //std::cout<<cursor->keys[i]<<" ";
+          for (int l=0; l < cursor->numKeys; l++){
+            std::cout<<cursor->keys[l]<<" ";
+          }
+          std::cout<<endl;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  //leaf nodes reached, compare key values to lower and upper bounds
+  //if leaf node in range, return the path taken from the root node
+  else{
+    bool check_found = false;
+
+    for(int j=0; j < cursor->numKeys; j++){
+      if (cursor->keys[j] >= lowerboundkey && cursor->keys[j] <= upperboundkey){
+        check_found = true;
+      }
+    }
+    if (check_found == true){
+      std::cout<<"Path taken to find key: "<<endl;
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+}
+
+void BPTree::displayKeys(Node *node){
+  for(int i=0; i<node->numKeys; i++){
+    std::cout<<node->keys[i]<<'\t';
+  }
+  std::cout<<endl;
+}
 
 void BPTree::displayNode(Node *node)
 {

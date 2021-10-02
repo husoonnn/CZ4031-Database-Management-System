@@ -103,7 +103,7 @@ void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
 }
 
 void Experiment3(){
-
+    
 }
 
 void Experiment4(){
@@ -140,6 +140,7 @@ void Experiment5(int blocksize, MemoryPool disk, MemoryPool index){
     tree.display(tree.getRoot());
     tree.deleteKey(1807);
     //tree.LLdisplay(tree.getRoot());
+    tree.search(tree.getRoot(),int(119),int(121));
     
 }
 
