@@ -347,6 +347,10 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
     }
     if (check_found == true){
       std::cout<<"Path taken to find key: "<<endl;
+      for (int k=0; k < cursor->numKeys; k++){
+        std::cout<<cursor->keys[k]<<" ";
+      }
+      std::cout<<endl;
       return true;
     }
     else{
