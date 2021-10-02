@@ -216,7 +216,7 @@ int main(){
 
     std::cout <<"*************************************Experiment 3*************************************"<<endl;
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
-    // tree.search(500,500);
+    tree.search(tree.getRoot(), 120, 6018);
     // std::cout << endl;
     // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
     // std::cout <<"Number of record blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
