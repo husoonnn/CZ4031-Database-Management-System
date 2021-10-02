@@ -343,6 +343,8 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
     for(int j=0; j < cursor->numKeys; j++){
       if (cursor->keys[j] >= lowerboundkey && cursor->keys[j] <= upperboundkey){
         check_found = true;
+        std::cout<<"Key found within range: "<<'\t'<<cursor->keys[j]<<endl;
+        std::cout<<"Tconst of the key found: "<<'\t'<<cursor->storagepointer[j].blockAddress<<endl;
       }
     }
     if (check_found == true){
