@@ -188,26 +188,62 @@ int main(){
     }
 
     //Experiment 1
-    std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
-    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
+    std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<" blocks"<<endl;
+    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<"B"<<endl;
 
+    //Save output to experiment1.txt
     std::cout.rdbuf(coutbuf);
 
+    //Experiment 2
     ofstream out2("outputs/experiment2_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out2.rdbuf()); 
-    // Experiment2(blocksize,disk,index);
-    std::cout<<"Parameter n of the tree is: "<<tree.getMaxKeys(blocksize)<<endl;
-    std::cout<<"Number of nodes of the B+ tree: "<<endl;
-    std::cout<<"Height of B+ tree is: "<<tree.getHeight()<<endl;
-    // tree.displayNode();
-    std::cout<<"Content of root node and it's first child node: "<<endl;
 
+    std::cout<<"Parameter n of the tree is: "<<tree.getMaxKeys(blocksize)<<endl;
+    std::cout<<"Number of nodes of the B+ tree: "<< tree.getnumNodes()<<endl;
+    std::cout<<"Height of B+ tree is: "<<tree.getHeight()<<endl;
+    std::cout<<"Content of root node and it's first child node: "<<endl;
+    tree.displayNode(tree.getRoot());
+
+    //Save output to experiment2.txt
     std::cout.rdbuf(coutbuf);
-    //insert function of experiment 3
+
+    //Experiment 3
+    ofstream out3("outputs/experiment3_" + to_string(blocksize) + "B.txt");
+    std::cout.rdbuf(out3.rdbuf()); 
+
+    // std::cout <<"=====================================Experiment 3=========================================="<<endl;
+    // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
+    // tree.search(500,500);
+    // std::cout << endl;
+    // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
+    // std::cout <<"Number of record blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
+    // std::cout << "\nNo more records found for numVotes equal to 500 "<< endl;
     
-    //insert function of experiment 4
+    //Save output to experiment3.txt
+    std::cout.rdbuf(coutbuf);
+
+    //Experiment 4
+    ofstream out4("outputs/experiment4_" + to_string(blocksize) + "B.txt");
+    std::cout.rdbuf(out4.rdbuf()); 
+
+    // std::cout <<"=====================================Experiment 4=========================================="<<endl;
+    // std::cout <<"Retrieving the attribute tconst of those movies with numVotes from 30,000 to 40,000 (inclusively)..."<<endl;
+    // tree.search(30000, 40000); 
+    // std::cout << endl;
+    // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
+    // std::cout <<"Number of data blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
+  
     
-    // Experiment5(blocksize,disk,index);
+    //Save output to experiment4.txt
+    std::cout.rdbuf(coutbuf);
+    
+    // Experiment5
+    ofstream out5("outputs/experiment4_" + to_string(blocksize) + "B.txt");
+    std::cout.rdbuf(out5.rdbuf()); 
+
+    
+    //Save output to experiment5.txt
+    std::cout.rdbuf(coutbuf);
 
     //repeat experiment(Y/N)
     return 0;

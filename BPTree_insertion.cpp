@@ -51,6 +51,7 @@ void BPTree::insert(Address address,int key) {
   //If empty tree, create new node
   if (root == NULL) {
     root = new Node(maxKeys);
+    numNodes += 1;
     root->storagepointer = &address; //link index key to storage
     root->keys[0] = key; //Insert new key into new array of keys in new node
     root->isLeaf = true;
@@ -92,6 +93,7 @@ void BPTree::insert(Address address,int key) {
     
     }else{ //if block no space
       Node *newLeaf = new Node(maxKeys); //create new node
+      numNodes += 1;
       newLeaf->storagepointer = &address;
       if (cursor->isLeaf){
         if (cursor->leafLinkPointer == NULL){
@@ -141,6 +143,7 @@ void BPTree::insert(Address address,int key) {
       if (cursor == root) {
         BPTlevel += 1;
         Node *newRoot = new Node(maxKeys);
+        numNodes += 1;
         newRoot->storagepointer = &address;
         newRoot->keys[0] = newLeaf->keys[0];
         newRoot->pointers[0] = cursor;
@@ -154,8 +157,10 @@ void BPTree::insert(Address address,int key) {
         insertInternal(newLeaf->keys[0], parent, newLeaf, address);
       }
       height = BPTlevel;
+      
     }
   }
+  
   // std::cout<<"key "<<key<<endl; 
 }
 
@@ -179,6 +184,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
   }
    else { //if parent node is already full, go through split using virtual array block
     Node *newInternal = new Node(maxKeys);
+    numNodes += 1;
     newInternal->storagepointer = &address;
     int virtualKey[MAX + 1];
     Node* virtualPtr[MAX + 2];
@@ -215,6 +221,7 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
     if (cursor == root) {
       BPTlevel += 1;
       Node *newRoot = new Node(maxKeys);
+      numNodes += 1;
       newRoot->storagepointer = &address;
       newRoot->keys[0] = cursor->keys[cursor->numKeys];
       newRoot->pointers[0] = cursor; //point to left child
@@ -294,12 +301,18 @@ Node *BPTree::getRoot(){
   return root;
 }
 
+int BPTree::getnumNodes(){
+  return numNodes;
+}
+
 int BPTree::getHeight(){
   return height;
 }
 
+
 void BPTree::displayNode(Node *node)
 {
+
   int i = 0;
   std::cout << "|";
   for (int i = 0; i < node->numKeys; i++)
@@ -312,10 +325,11 @@ void BPTree::displayNode(Node *node)
   {
     std::cout << " x |";      // Remaining empty keys
   }
-
-  if (node->isLeaf != true) {
+  cout << "\n";
+  if (node->isLeaf != true) { //if not leaf node
       for (int i = 0; i < node->numKeys + 1; i++) {
         display(node->pointers[i]);
       }
   }
+
 }

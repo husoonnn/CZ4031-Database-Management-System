@@ -1,4 +1,12 @@
 Parameter n of the tree is: 3
-Number of nodes of the B+ tree: 
-Height of B+ tree is: 5
+Number of nodes of the B+ tree: 8
+Height of B+ tree is: 3
 Content of root node and it's first child node: 
+|1807 |  x | x |
+198 | 1342 | X | 
+115 | 120 | 154 | 
+198 | 262 | 652 | 
+1342 | 1645 | X | 
+6018 | X | X | 
+1807 | 2127 | X | 
+6018 | 10287 | X | 
