@@ -9,6 +9,7 @@ using namespace std;
 Node::Node(int maxKeys){
     keys = new int[maxKeys];
     pointers = new Node*[maxKeys+1];
+    storagepointer = new Address[maxKeys];
     leafLinkPointer = NULL;
 
     //int i = 0;

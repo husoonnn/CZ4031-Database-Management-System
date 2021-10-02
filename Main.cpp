@@ -93,11 +93,11 @@ void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
         }
         file.close();
     }
-    tree.display(tree.getRoot());
+    // tree.display(tree.getRoot());
 }
 
 void Experiment3(){
-
+    
 }
 
 void Experiment4(){
@@ -134,6 +134,7 @@ void Experiment5(int blocksize, MemoryPool disk, MemoryPool index){
     tree.display(tree.getRoot());
     //tree.deleteKey(1807);
     //tree.LLdisplay(tree.getRoot());
+    tree.search(tree.getRoot(),int(119),int(121));
     
 }
 
@@ -145,7 +146,7 @@ int main(){
     MemoryPool disk(150000000,blocksize);
     MemoryPool index(300000000,blocksize);
 
-    // Experiment1(blocksize,disk,index);
+    //Experiment1(blocksize,disk,index);
     //Experiment2(blocksize,disk,index);
     //insert function of experiment 3
     //insert function of experiment 4
