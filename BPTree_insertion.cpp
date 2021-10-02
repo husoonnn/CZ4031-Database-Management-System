@@ -5,7 +5,7 @@
 #include <cstring>
 #include <iostream>
 
-int const MAX = 3;
+int const MAX = 23;
 int BPTlevel = 1;
 
 using namespace std;
@@ -105,9 +105,9 @@ void BPTree::insert(Address address,int key) {
           cursor->leafLinkPointer = newLeaf;
         }
       }
-      int virtualNode[MAX+1]; //KIVKIVvivivivii
+      int virtualNode[maxKeys+1]; //KIVKIVvivivivii
 
-      for (int i = 0; i < maxKeys; i++) { //take in (max keys + 1) keys and store in vir node
+      for (int i = 0; i < maxKeys; i++) { //take in (maxKeys keys + 1) keys and store in vir node
         virtualNode[i] = cursor->keys[i];
       }
 
@@ -173,7 +173,7 @@ void BPTree::insert(Address address,int key) {
 //inserting a key into the non-leaf node of the tree
 void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address) {
   //if got space for insertion
-  if (cursor->numKeys < MAX) {
+  if (cursor->numKeys < maxKeys) {
     int i = 0;
     while (key > cursor->keys[i] && i < cursor->numKeys)//traverse block
       i++;
@@ -192,28 +192,28 @@ void BPTree::insertInternal(int key, Node *cursor, Node *child, Address address)
    else { //if parent node is already full, go through split using virtual array block
     Node *newInternal = new Node(maxKeys);
     numNodes += 1;
-    int virtualKey[MAX + 1];
-    Node* virtualPtr[MAX + 2];
-    for (int i = 0; i < MAX; i++) { //adding current keys to virtualkey array
+    int virtualKey[maxKeys + 1];
+    Node* virtualPtr[maxKeys + 2];
+    for (int i = 0; i < maxKeys; i++) { //adding current keys to virtualkey array
       virtualKey[i] = cursor->keys[i];
     }
-    for (int i = 0; i < MAX + 1; i++) {
+    for (int i = 0; i < maxKeys + 1; i++) {
       virtualPtr[i] = cursor->pointers[i]; //adding current pointers to virtual array
     }
     int i = 0, j;
-    while (key > virtualKey[i] && i < MAX) //traversing virtual array to insert key
+    while (key > virtualKey[i] && i < maxKeys) //traversing virtual array to insert key
       i++; 
-    for (int j = MAX + 1; j > i; j--) { //shifting keys greater than key to the right
+    for (int j = maxKeys + 1; j > i; j--) { //shifting keys greater than key to the right
       virtualKey[j] = virtualKey[j - 1];
     }
     virtualKey[i] = key; //insert key
-    for (int j = MAX + 2; j > i + 1; j--) {  //shifting pointers to the right
+    for (int j = maxKeys + 2; j > i + 1; j--) {  //shifting pointers to the right
       virtualPtr[j] = virtualPtr[j - 1];
     }
     virtualPtr[i + 1] = child; //assign pointer to new child node
     newInternal->isLeaf = false; //non-leaf
-    cursor->numKeys = (MAX + 1) / 2; //splitting parent node into two child nodes
-    newInternal->numKeys = MAX - (MAX + 1) / 2; 
+    cursor->numKeys = (maxKeys + 1) / 2; //splitting parent node into two child nodes
+    newInternal->numKeys = maxKeys - (maxKeys + 1) / 2; 
 
     // inserting keys into new node from virtual node
     for (i = 0, j = cursor->numKeys + 1; i < newInternal->numKeys; i++, j++) {
@@ -344,7 +344,8 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
       if (cursor->keys[j] >= lowerboundkey && cursor->keys[j] <= upperboundkey){
         check_found = true;
         std::cout<<"Key found within range: "<<'\t'<<cursor->keys[j]<<endl;
-        std::cout<<"Tconst of the key found: "<<'\t'<<cursor->storagepointer[j].blockAddress<<endl;
+        std::cout<<"Tconst of the key found: "<<'\t'<<endl;
+        displayBlock(cursor->storagepointer[j].blockAddress,cursor->keys[j]);
       }
     }
     if (check_found == true){
@@ -390,4 +391,49 @@ void BPTree::displayNode(Node *node)
       }
   }
 
+}
+
+void BPTree::displayBlock(void *blockAddress,int targetvalue)
+{
+  // Load block into memory
+  void *block = operator new(nodeSize);
+  std::memcpy(block, blockAddress, nodeSize);
+
+  unsigned char testBlock[nodeSize];
+  memset(testBlock, '\0', nodeSize);
+
+  // Block is empty.
+  if (memcmp(testBlock, block, nodeSize) == 0)
+  {
+    std::cout << "Empty block!" << '\n';
+    return;
+  }
+
+  unsigned char *blockChar = (unsigned char *)block;
+
+  int i = 0;
+  int numrecords = 0;
+  float totalratings = 0;
+  while (i < nodeSize)
+  {
+    // Load each record
+    void *recordAddress = operator new(sizeof(Record));
+    std::memcpy(recordAddress, blockChar, sizeof(Record));
+
+    Record *record = (Record *)recordAddress;
+
+    if (record->numVotes == targetvalue){
+      numrecords += 1;
+      std::cout << "[" << record->tconst << "|" << record->averageRating << "|" << record->numVotes << "]";
+      totalratings += record->averageRating;
+    }
+    
+    blockChar += sizeof(Record);
+    i += sizeof(Record);
+  }
+
+  cout << "\n";
+  std::cout<<"Total number of records: "<<numrecords<<endl;
+  std::cout<<"Total average ratings: "<<totalratings<<endl;
+  std::cout<<"Average of average ratings: "<<totalratings/numrecords<<endl;
 }

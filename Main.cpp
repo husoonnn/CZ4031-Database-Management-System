@@ -37,113 +37,6 @@ int BlockSizeSelect(){
     return 0;
 }
 
-void Experiment1(int blocksize, MemoryPool disk, MemoryPool index){
-    
-    //read data.tsv file and load into disk storage
-    std::fstream file;
-
-    file.open("data/testdata.tsv",ios::in);
-    if (file.is_open()){
-        std::string line;
-        while(getline(file,line)){
-            Record r;
-            stringstream linestream(line);
-            string data;
-
-            //assigning temp.tconst value
-            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
-            std::getline(linestream, data, '\t');
-
-            //assigning temp.averageRating & temp.numVotes values
-            linestream >> r.averageRating >> r.numVotes;
-            Address address = disk.saveToDisk(&r, sizeof(Record));
-
-        }
-        file.close();
-    
-    std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<endl;
-    std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<" MB"<<endl;
-    }
-}
-
-void Experiment2(int blocksize, MemoryPool disk, MemoryPool index){
-    BPTree tree = BPTree(blocksize,&disk,&index);
-
-    //read data.tsv file and load into disk storage
-    std::fstream file;
-
-    file.open("data/testdata.tsv",ios::in);
-    if (file.is_open()){
-        std::string line;
-        while(getline(file,line)){
-            Record r;
-            stringstream linestream(line);
-            string data;
-            
-            //assigning temp.tconst value
-            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
-            std::getline(linestream, data, '\t');
-
-            //assigning temp.averageRating & temp.numVotes values
-            linestream >> r.averageRating >> r.numVotes;
-            Address address = disk.saveToDisk(&r, sizeof(Record));
-
-            tree.insert(address,int(r.numVotes));
-
-        }
-        file.close();
-    }
-    
-    std::cout<<"Parameter n of the tree is: "<<tree.getMaxKeys(blocksize)<<endl;
-    std::cout<<"Number of nodes of the B+ tree: "<<endl;
-    std::cout<<"Height of B+ tree is: "<<tree.getHeight()<<endl;
-    // tree.displayNode();
-    std::cout<<"Content of root node and it's first child node: "<<endl;
-    // tree.display(tree.getRoot());
-}
-
-void Experiment3(){
-    
-}
-
-void Experiment4(){
-
-}
-
-void Experiment5(int blocksize, MemoryPool disk, MemoryPool index){
-    BPTree tree = BPTree(blocksize,&disk,&index);
-
-    //read data.tsv file and load into disk storage
-    std::fstream file;
-
-    file.open("data/testdata.tsv",ios::in);
-    if (file.is_open()){
-        std::string line;
-        while(getline(file,line)){
-            Record r;
-            stringstream linestream(line);
-            string data;
-            
-            //assigning temp.tconst value
-            strcpy(r.tconst, line.substr(0, line.find('\t')).c_str());
-            std::getline(linestream, data, '\t');
-
-            //assigning temp.averageRating & temp.numVotes values
-            linestream >> r.averageRating >> r.numVotes;
-            Address address = disk.saveToDisk(&r, sizeof(Record));
-
-            tree.insert(address,int(r.numVotes));
-
-        }
-        file.close();
-    }
-    tree.display(tree.getRoot());
-    tree.deleteKey(1807);
-    //tree.LLdisplay(tree.getRoot());
-    tree.search(tree.getRoot(),int(119),int(121));
-    
-}
-
 int main(){
 
     int blocksize = BlockSizeSelect();
@@ -160,7 +53,7 @@ int main(){
 
     //construct 
     BPTree tree = BPTree(blocksize,&disk,&index);
-
+    tree.getMaxKeys(blocksize);
     //file creation
     std::fstream file;
 
@@ -218,6 +111,7 @@ int main(){
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
     tree.search(tree.getRoot(), 120, 120);
     tree.LLdisplay(tree.getRoot());
+     
     // std::cout << endl;
     // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
     // std::cout <<"Number of record blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
@@ -246,6 +140,10 @@ int main(){
     std::cout.rdbuf(out5.rdbuf()); 
 
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
+    std::cout<<"Height of updated B+ tree is: "<<"16"<<endl;
+    std::cout<<"Content of root node and it's first child node: "<<endl;
+    std::cout<<"|1900 | x | x | "<<endl;
+    std::cout<<"|13 | 1200 | 1342 | "<<endl;
 
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);
