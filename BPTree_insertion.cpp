@@ -317,7 +317,6 @@ int BPTree::getHeight(){
 bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
 
   bool search_result;
-  bool search_check=false;
 
   // if leaf nodes not reach, recursively traverse the b+ tree
   if (cursor->isLeaf != true){
@@ -325,20 +324,16 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
       if (cursor->pointers[i] != NULL){
         search_result = search(cursor->pointers[i],lowerboundkey,upperboundkey);
         if (search_result == true){
-          search_check = true;
+          //std::cout<<cursor->keys[i]<<" ";
+          for (int l=0; l < cursor->numKeys; l++){
+            std::cout<<cursor->keys[l]<<" ";
+          }
+          std::cout<<endl;
+          return true;
         }
       }
     }
-    if (search_check == true){
-      for (int l=0; l < cursor->numKeys; l++){
-        std::cout<<cursor->keys[l]<<" ";
-      }
-      std::cout<<endl;
-      return true;
-    }
-    else {
-      return false;
-    }
+    return false;
   }
   //leaf nodes reached, compare key values to lower and upper bounds
   //if leaf node in range, return the path taken from the root node
@@ -365,11 +360,6 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
       return false;
     }
   }
-}
-
-void BPTree::displayBlock(void *blockAddress){
-
-
 }
 
 void BPTree::displayKeys(Node *node){
