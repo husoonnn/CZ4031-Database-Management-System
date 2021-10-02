@@ -1,3 +1,17 @@
 *************************************Experiment 3*************************************
-Key found within range: 	120
+Key found within range: 	16
+Tconst of the key found: 	
+[tt0000058|4.6|16][tt0000059|4|16][tt0000072|4.5|16]
+Total number of records: 3
+Total average ratings: 13.1
+Average of average ratings: 4.36667
+Path taken to find key: 
+9 12 13 14 14 14 14 15 15 15 15 15 15 15 15 16 
+Key found within range: 	16
+Tconst of the key found: 	
+[tt0000081|4.4|16][tt0000086|4.4|16][tt0000090|4.4|16][tt0000099|4.9|16]
+Total number of records: 4
+Total average ratings: 18.1
+Average of average ratings: 4.525
+Key found within range: 	16
 Tconst of the key found: 	
