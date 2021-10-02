@@ -164,8 +164,8 @@ int main(){
     std::fstream file;
 
     //datasets
-    //file.open("data/data.tsv",ios::in);
-    file.open("data/testdata.tsv",ios::in);
+    file.open("data/data.tsv",ios::in);
+    // file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
         std::string line;
         while(getline(file,line)){
