@@ -48,6 +48,7 @@ class BPTree{
         void print(Node *cursor);
         void displayNode(Node *node);
         void displayKeys(Node *node);
+        void displayBlock(void *blockAddress);
         void LLdisplay(Node *cursor);
         bool search(Node *cursor, int lowerboundkey, int upperboundkey);
         Node *getRoot();

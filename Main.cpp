@@ -109,7 +109,7 @@ int main(){
 
     std::cout <<"*************************************Experiment 3*************************************"<<endl;
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
-    tree.search(tree.getRoot(), 120, 120);
+    tree.search(tree.getRoot(), 16, 16);
     tree.LLdisplay(tree.getRoot());
      
     // std::cout << endl;
