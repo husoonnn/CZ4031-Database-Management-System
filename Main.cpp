@@ -188,6 +188,7 @@ int main(){
     }
 
     //Experiment 1
+    std::cout <<"*************************************Experiment 1*************************************"<<endl;
     std::cout<<"Number of blocks: "<<disk.getNumOfBlocks()<<" blocks"<<endl;
     std::cout<<"Size of database: "<<disk.getSizeOfDatabase()<<"B"<<endl;
 
@@ -198,6 +199,7 @@ int main(){
     ofstream out2("outputs/experiment2_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out2.rdbuf()); 
 
+    std::cout <<"*************************************Experiment 2*************************************"<<endl;
     std::cout<<"Parameter n of the tree is: "<<tree.getMaxKeys(blocksize)<<endl;
     std::cout<<"Number of nodes of the B+ tree: "<< tree.getnumNodes()<<endl;
     std::cout<<"Height of B+ tree is: "<<tree.getHeight()<<endl;
@@ -211,7 +213,7 @@ int main(){
     ofstream out3("outputs/experiment3_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out3.rdbuf()); 
 
-    // std::cout <<"=====================================Experiment 3=========================================="<<endl;
+    std::cout <<"*************************************Experiment 3*************************************"<<endl;
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
     // tree.search(500,500);
     // std::cout << endl;
@@ -225,8 +227,8 @@ int main(){
     //Experiment 4
     ofstream out4("outputs/experiment4_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out4.rdbuf()); 
-
-    // std::cout <<"=====================================Experiment 4=========================================="<<endl;
+    
+    std::cout <<"*************************************Experiment 4*************************************"<<endl;
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes from 30,000 to 40,000 (inclusively)..."<<endl;
     // tree.search(30000, 40000); 
     // std::cout << endl;
@@ -238,10 +240,11 @@ int main(){
     std::cout.rdbuf(coutbuf);
     
     // Experiment5
-    ofstream out5("outputs/experiment4_" + to_string(blocksize) + "B.txt");
+    ofstream out5("outputs/experiment5_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out5.rdbuf()); 
 
-    
+    std::cout <<"*************************************Experiment 5*************************************"<<endl;
+
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);
 
