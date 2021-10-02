@@ -131,7 +131,7 @@ void Experiment5(int blocksize, MemoryPool disk, MemoryPool index){
         }
         file.close();
     }
-    tree.display(tree.getRoot());
+    //tree.display(tree.getRoot());
     //tree.deleteKey(1807);
     //tree.LLdisplay(tree.getRoot());
     tree.search(tree.getRoot(),int(119),int(121));

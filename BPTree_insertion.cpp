@@ -304,10 +304,16 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
   // if leaf nodes not reach, recursively traverse the b+ tree
   if (cursor->isLeaf != true){
     for(int i=0; i < cursor->numKeys + 1; i++){
-      search_result = search(cursor->pointers[i],lowerboundkey,upperboundkey);
-      if (search_result == true){
-        std::cout<<cursor->keys[i]<<endl;
-        return true;
+      if (cursor->pointers[i] != NULL){
+        search_result = search(cursor->pointers[i],lowerboundkey,upperboundkey);
+        if (search_result == true){
+          //std::cout<<cursor->keys[i]<<" ";
+          for (int l=0; l < cursor->numKeys; l++){
+            std::cout<<cursor->keys[l]<<" ";
+          }
+          std::cout<<endl;
+          return true;
+        }
       }
     }
     return false;
@@ -315,17 +321,20 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
   //leaf nodes reached, compare key values to lower and upper bounds
   //if leaf node in range, return the path taken from the root node
   else{
+    bool check_found = false;
+
     for(int j=0; j < cursor->numKeys; j++){
       if (cursor->keys[j] >= lowerboundkey && cursor->keys[j] <= upperboundkey){
-        std::cout<<"Path taken to find key: "<<endl;
-        std::cout<<cursor->keys[j]<<endl;
-        return true;
-      }
-      else{
-        return false;
+        check_found = true;
       }
     }
-    return false;
+    if (check_found == true){
+      std::cout<<"Path taken to find key: "<<endl;
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 }
 
