@@ -164,7 +164,7 @@ int main(){
     std::fstream file;
 
     //datasets
-    file.open("data/data.tsv",ios::in);
+    file.open("data/testdata.tsv",ios::in);
     // file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
         std::string line;
@@ -248,6 +248,11 @@ int main(){
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);
 
-    //repeat experiment(Y/N)
+    //Finding the terminal outputs in various experiment files
+    std::cerr << "\n************************************************************************************************************" << endl;
+    std::cerr << "Output in terminal saved to /outputs folder. Refer to the experiment files in the folder for all the experiments." << endl;
+    std::cerr << "Run again to get the results for your other blocksize choice." << endl;
+    std::cerr << "************************************************************************************************************" << endl;
+    
     return 0;
 }
