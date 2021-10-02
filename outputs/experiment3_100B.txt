@@ -1,19 +1,122 @@
 *************************************Experiment 3*************************************
-Key found within range: 	120
-Tconst of the key found: 	0x227332ec040
+Key found within range: 	16
+Tconst of the key found: 	0
+Key found within range: 	16
+Tconst of the key found: 	0
 Path taken to find key: 
-115 120 154 
-198 1342 
-1807 
-0x227332ec0a4
-0x227332ec040
-0x227332ec0a4
-0x227331f2ba0
-0x227332ec108
+16 16 
+Key found within range: 	16
+Tconst of the key found: 	0
+Path taken to find key: 
+16 17 
+Key found within range: 	16
+Tconst of the key found: 	0x2cfbab407ac
+Key found within range: 	16
+Tconst of the key found: 	0
+Key found within range: 	16
+Tconst of the key found: 	0
+Path taken to find key: 
+16 16 16 
+16 16 16 
+16 17 
+120 1200 
+1342 1807 
+0x2cfbab40428
+0x2cfbab40428
+0x2cfbab40748
+0x2cfbab40748
 0
-0x227331f2a00
 0
-0x227331f2c70
 0
-0x227331d6380
+0x2cfbab4061c
+0
+0
+0
+0
+0x2cfbab40748
+0x2cfbab30150
+0
+0x2cfbab405b8
+0x2cfbab4048c
+0
+0
+0
+0
+0x2cfbab407ac
+0
+0
+0
+0
+0x2cfbab406e4
+0
+0x2cfbab40680
+0
+0x2cfbab407ac
+0
+0
+0x2cfbab407ac
+0
+0x2cfbab407ac
+0
+0
+0
+0x2cfbab40428
+0
+0
+0
+0
+0
+0
+0x2cfbab40680
+0x2cfbab40554
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0x2cfbab40298
+0
+0
+0x2cfbab403c4
+0
+0
+0
+0
+0
+0
+0
+0
+0x2cfbaa02b20
+0x2cfbab4016c
+0
+0
+0
+0
+0
+0x2cfbab40234
+0
+0x2cfbab40234
+0
+0
+0
+0x2cfbab40234
+0
+0
+0
+0x2cfbaa02980
+0x2cfbab402fc
+0x2cfbab405b8
+0
+0
+0x2cfbaa02bf0
+0
+0
+0
+0
+0
+0x2cfbab36420
 0
