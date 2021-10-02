@@ -138,11 +138,16 @@ int main(){
     // Experiment5
     ofstream out5("outputs/experiment5_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out5.rdbuf()); 
+
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
-    std::cout<<"Height of updated B+ tree is: "<<"16"<<endl;
-    std::cout<<"Content of root node and it's first child node: "<<endl;
-    std::cout<<"|1900 | x | x | "<<endl;
-    std::cout<<"|13 | 1200 | 1342 | "<<endl;
+    for(int i =0; i<43; i++){
+        tree.deleteKey(9);
+    }
+    
+    // tree.deleteKey(652);
+    // tree.deleteKey(888);
+    std::cout <<"\n";
+    
 
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);

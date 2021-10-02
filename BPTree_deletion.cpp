@@ -5,10 +5,8 @@
 #include <cstring>
 #include <iostream>
 
-int const MAX = 3;
-
 using namespace std;
-
+int counter = 0;
 void BPTree::deleteKey(int key){
   if (root == NULL) {
     cout << "Tree empty\n";
@@ -43,7 +41,7 @@ void BPTree::deleteKey(int key){
       }
     }
     if (!found) {
-      cout << "Not found\n";
+      // cout << "Not found\n";
       return;
     }
     for (int i = pos; i < cursor->numKeys; i++) {
@@ -51,7 +49,7 @@ void BPTree::deleteKey(int key){
     }
     cursor->numKeys--;
     if (cursor == root) {
-      for (int i = 0; i < MAX + 1; i++) {
+      for (int i = 0; i < maxKeys + 1; i++) {
         cursor->pointers[i] = NULL;
       }
       if (cursor->numKeys == 0) {
@@ -65,12 +63,12 @@ void BPTree::deleteKey(int key){
     }
     cursor->pointers[cursor->numKeys] = cursor->pointers[cursor->numKeys + 1];
     cursor->pointers[cursor->numKeys + 1] = NULL;
-    if (cursor->numKeys >= (MAX + 1) / 2) {
+    if (cursor->numKeys >= (maxKeys + 1) / 2) {
       return;
     }
     if (leftSibling >= 0) {
       Node *leftNode = parent->pointers[leftSibling];
-      if (leftNode->numKeys >= (MAX + 1) / 2 + 1) {
+      if (leftNode->numKeys >= (maxKeys + 1) / 2 + 1) {
         for (int i = cursor->numKeys; i > 0; i--) {
           cursor->keys[i] = cursor->keys[i - 1];
         }
@@ -87,7 +85,7 @@ void BPTree::deleteKey(int key){
     }
     if (rightSibling <= parent->numKeys) {
       Node *rightNode = parent->pointers[rightSibling];
-      if (rightNode->numKeys >= (MAX + 1) / 2 + 1) {
+      if (rightNode->numKeys >= (maxKeys + 1) / 2 + 1) {
         cursor->numKeys++;
         cursor->pointers[cursor->numKeys] = cursor->pointers[cursor->numKeys - 1];
         cursor->pointers[cursor->numKeys - 1] = NULL;
@@ -111,6 +109,8 @@ void BPTree::deleteKey(int key){
       leftNode->numKeys += cursor->numKeys;
       leftNode->pointers[leftNode->numKeys] = cursor->pointers[cursor->numKeys];
       deleteInternal(parent->keys[leftSibling], parent, cursor);
+      counter += 1;
+
       delete[] cursor->keys;
       delete[] cursor->pointers;
       delete cursor;
@@ -124,11 +124,17 @@ void BPTree::deleteKey(int key){
       cursor->pointers[cursor->numKeys] = rightNode->pointers[rightNode->numKeys];
       cout << "Merging two leaf nodes\n";
       deleteInternal(parent->keys[rightSibling - 1], parent, rightNode);
+      counter += 1;
       delete[] rightNode->keys;
       delete[] rightNode->pointers;
       delete rightNode;
     }
   }
+  std::cout<< "Height of B+ Tree before deletion: "<< getHeight()<<endl;
+  std::cout<< "Number of nodes before deletion: "<< getnumNodes()<<endl;
+  std::cout<< "Number of nodes deleted: "<< counter<<endl;
+  std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
+  std::cout<< "Number of nodes after deletion: "<< getnumNodes()-counter<<endl;
 }
 
 void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
@@ -175,7 +181,7 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
     cursor->pointers[i] = cursor->pointers[i + 1];
   }
   cursor->numKeys--;
-  if (cursor->numKeys >= (MAX + 1) / 2 - 1) {
+  if (cursor->numKeys >= (maxKeys + 1) / 2 - 1) {
     return;
   }
   if (cursor == root)
@@ -191,7 +197,7 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
   }
   if (leftSibling >= 0) {
     Node *leftNode = parent->pointers[leftSibling];
-    if (leftNode->numKeys >= (MAX + 1) / 2) {
+    if (leftNode->numKeys >= (maxKeys + 1) / 2) {
       for (int i = cursor->numKeys; i > 0; i--) {
         cursor->keys[i] = cursor->keys[i - 1];
       }
@@ -208,7 +214,7 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
   }
   if (rightSibling <= parent->numKeys) {
     Node *rightNode = parent->pointers[rightSibling];
-    if (rightNode->numKeys >= (MAX + 1) / 2) {
+    if (rightNode->numKeys >= (maxKeys + 1) / 2) {
       cursor->keys[cursor->numKeys] = parent->keys[pos];
       parent->keys[pos] = rightNode->keys[0];
       for (int i = 0; i < rightNode->numKeys - 1; i++) {

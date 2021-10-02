@@ -1,0 +1,44 @@
+*************************************Experiment 5*************************************
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 1
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 23
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 2
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 22
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 3
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 21
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 4
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 20
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 5
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 19
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 6
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 18
+Changed root node
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 7
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 17
+Merging two leaf nodes
+Height of B+ Tree before deletion: 4
+Number of nodes before deletion: 24
+Number of nodes deleted: 8
+Height of B+ Tree after deletion: 4
+Number of nodes after deletion: 16
+

@@ -27,10 +27,10 @@ int BPTree::getMaxKeys(std::size_t blocksize){
     size_t totalspace = sizeof(Address); //accounting for space of first pointer in a node
     maxKeys = 0;
 
-    while (totalspace + sizeof(Address) + sizeof(float) <= remainderNodeSpace)
+    while (totalspace + sizeof(Address) + sizeof(int) <= remainderNodeSpace)
     {
         //adding space of one KV pair in a node one by one 
-        totalspace = totalspace + (sizeof(Address) + sizeof(float)); 
+        totalspace = totalspace + (sizeof(Address) + sizeof(int)); 
         maxKeys += 1;
     }
 

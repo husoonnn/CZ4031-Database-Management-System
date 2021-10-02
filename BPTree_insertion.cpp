@@ -5,7 +5,6 @@
 #include <cstring>
 #include <iostream>
 
-int const MAX = 23;
 int BPTlevel = 1;
 
 using namespace std;
@@ -350,7 +349,7 @@ bool BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
         check_found = true;
         std::cout<<"Key found within range: "<<'\t'<<cursor->keys[j]<<endl;
         std::cout<<"Tconst of the key found: "<<'\t'<<endl;
-        displayBlock(cursor->storagepointer[j].blockAddress, cursor->keys[j]);
+        // displayBlock(cursor->storagepointer[j].blockAddress, cursor->keys[j]);
       }
     }
     if (check_found == true){
