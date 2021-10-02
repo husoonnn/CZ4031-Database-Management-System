@@ -138,7 +138,7 @@ int main(){
     // Experiment5
     ofstream out5("outputs/experiment5_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out5.rdbuf()); 
-
+    std::cout <<"*************************************Experiment 5*************************************"<<endl;
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
     std::cout<<"Height of updated B+ tree is: "<<"16"<<endl;
     std::cout<<"Content of root node and it's first child node: "<<endl;
