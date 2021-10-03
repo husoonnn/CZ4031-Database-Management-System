@@ -47,7 +47,7 @@ BPTree::BPTree(std::size_t blocksize, MemoryPool *disk, MemoryPool *index){
     root = NULL;
 
     // Set node size to be equal to block size.
-    //nodeSize = blockSize; KIVIVIVIVIVIVIVIVIVIVIVIVIV
+    nodeSize = blocksize;
 
     // Initialize initial variables
     height = 0;

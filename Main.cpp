@@ -109,8 +109,8 @@ int main(){
 
     std::cout <<"*************************************Experiment 3*************************************"<<endl;
     // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
-    tree.search(tree.getRoot(), 16, 16);
-    tree.LLdisplay(tree.getRoot());
+    tree.search(tree.getRoot(), 120, 120);
+    tree.printKeys(tree.getRoot());
      
     // std::cout << endl;
     // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
@@ -139,10 +139,11 @@ int main(){
     ofstream out5("outputs/experiment5_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out5.rdbuf()); 
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
-    std::cout<<"Height of updated B+ tree is: "<<"16"<<endl;
-    std::cout<<"Content of root node and it's first child node: "<<endl;
-    std::cout<<"|1900 | x | x | "<<endl;
-    std::cout<<"|13 | 1200 | 1342 | "<<endl;
+    tree.displayNode(tree.getRoot());
+    std::cout <<"*************************************Experiment 5*************************************"<<endl;
+    for(int i =0; i<=30; i++){
+        tree.deleteKey(120);
+    }
 
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);

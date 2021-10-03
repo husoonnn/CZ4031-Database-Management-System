@@ -49,7 +49,8 @@ class BPTree{
         void displayNode(Node *node);
         void displayKeys(Node *node);
         void LLdisplay(Node *cursor);
-        bool search(Node *cursor, int lowerboundkey, int upperboundkey);
+        void search(Node *cursor, int lowerboundkey, int upperboundkey);
+        void printKeys(Node *cursor);
         Node *getRoot();
         int getHeight();
         int getnumNodes();
