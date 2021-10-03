@@ -108,13 +108,10 @@ int main(){
     std::cout.rdbuf(out3.rdbuf()); 
 
     std::cout <<"*************************************Experiment 3*************************************"<<endl;
-    // std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
-    tree.search(tree.getRoot(), 120, 120);
-    tree.printKeys(tree.getRoot());
+    std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
+    tree.search(tree.getRoot(), 500, 500);
      
-    // std::cout << endl;
-    // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
-    // std::cout <<"Number of record blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
+    
     // std::cout << "\nNo more records found for numVotes equal to 500 "<< endl;
     
     //Save output to experiment3.txt
@@ -125,12 +122,9 @@ int main(){
     std::cout.rdbuf(out4.rdbuf()); 
     
     std::cout <<"*************************************Experiment 4*************************************"<<endl;
-    // std::cout <<"Retrieving the attribute tconst of those movies with numVotes from 30,000 to 40,000 (inclusively)..."<<endl;
-    // tree.search(30000, 40000); 
-    // std::cout << endl;
-    // std::cout <<"Number of index blocks the process accesses: "<<index.resetBlocksAccessed()<<endl; 
-    // std::cout <<"Number of data blocks the process accesses: "<<disk.resetBlocksAccessed()<<endl;
-  
+    std::cout <<"Retrieving the attribute tconst of those movies with numVotes from 30,000 to 40,000 (inclusively)..."<<endl;
+    tree.search(tree.getRoot(),30000, 40000); 
+    
     
     //Save output to experiment4.txt
     std::cout.rdbuf(coutbuf);
@@ -139,12 +133,14 @@ int main(){
     ofstream out5("outputs/experiment5_" + to_string(blocksize) + "B.txt");
     std::cout.rdbuf(out5.rdbuf()); 
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
-    tree.displayNode(tree.getRoot());
-    std::cout <<"*************************************Experiment 5*************************************"<<endl;
-    for(int i =0; i<=30; i++){
-        tree.deleteKey(120);
-    }
+   
 
+    for(int i=0; i<48; i++){
+        tree.deleteKey(1000);
+    }
+    
+    std::cout<<"Number of leaf nodes deleted: "<<tree.getCounter()<<endl;
+    tree.displayNode(tree.getRoot());
     //Save output to experiment5.txt
     std::cout.rdbuf(coutbuf);
 

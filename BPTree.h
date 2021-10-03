@@ -55,6 +55,8 @@ class BPTree{
         int getHeight();
         int getnumNodes();
         void displayBlock(void *blockAddress, int targetkey);
+        int getCounter();
+
 
 };
 #endif

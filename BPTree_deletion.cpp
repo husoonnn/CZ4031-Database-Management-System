@@ -1,17 +1,26 @@
 #include "BPTree.h"
 #include "types.h"
- 
+
 #include <vector>
 #include <cstring>
 #include <iostream>
- 
+
+
 using namespace std;
 static int counter = 0;
+
+int BPTree::getCounter(){
+  return counter;
+}
+
 void BPTree::deleteKey(int key){
+  
+      
   if (root == NULL) {
     cout << "Tree empty\n";
   } 
   else {
+    
     Node *cursor = root;
     Node *parent;
     int leftSibling, rightSibling;
@@ -37,6 +46,7 @@ void BPTree::deleteKey(int key){
     for (pos = 0; pos < cursor->numKeys; pos++) {
       if (cursor->keys[pos] == key) {
         found = true;
+      
         break;
       }
     }
@@ -111,12 +121,11 @@ void BPTree::deleteKey(int key){
       deleteInternal(parent->keys[leftSibling], parent, cursor);
       counter += 1;
       std::cout<< "Number of nodes deleted: "<<counter<<endl;
-      std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
-      displayNode(getRoot());
- 
       delete[] cursor->keys;
       delete[] cursor->pointers;
       delete cursor;
+
+
     } else if (rightSibling <= parent->numKeys) {
       Node *rightNode = parent->pointers[rightSibling];
       for (int i = cursor->numKeys, j = 0; j < rightNode->numKeys; i++, j++) {
@@ -129,21 +138,16 @@ void BPTree::deleteKey(int key){
       deleteInternal(parent->keys[rightSibling - 1], parent, rightNode);
       counter += 1;
       std::cout<< "Number of nodes deleted: "<<counter<<endl;
-      std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
-      displayNode(getRoot());
       delete[] rightNode->keys;
       delete[] rightNode->pointers;
       delete rightNode;
+      
+
+
     }
   }
-  // displayNode(getRoot());
-  // std::cout<< "Height of B+ Tree before deletion: "<< getHeight()<<endl;
-  // std::cout<< "Number of nodes before deletion: "<< getnumNodes()<<endl;
-  // std::cout<< "Number of nodes deleted: "<<counter<<endl;
-  // std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
-  // std::cout<< "Number of nodes after deletion: "<< getnumNodes()-counter<<endl;
 }
- 
+
 void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
   if (cursor == root) {
     if (cursor->numKeys == 1) {
@@ -151,6 +155,8 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
         delete[] child->keys;
         delete[] child->pointers;
         delete child;
+
+        std::cout<< "Number of nodes deleted: "<<counter<<endl;
         root = cursor->pointers[0];
         delete[] cursor->keys;
         delete[] cursor->pointers;
@@ -161,6 +167,9 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
         delete[] child->keys;
         delete[] child->pointers;
         delete child;
+      
+        std::cout<< "Number of nodes deleted: "<<counter<<endl;
+        
         root = cursor->pointers[1];
         delete[] cursor->keys;
         delete[] cursor->pointers;
@@ -249,11 +258,6 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
     leftNode->numKeys += cursor->numKeys + 1;
     cursor->numKeys = 0;
     deleteInternal(parent->keys[leftSibling], parent, cursor);
-    counter += 1;
-    std::cout<< "Number of nodes deleted: "<<counter<<endl;
-    std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
-    displayNode(getRoot());
-    std::cout<< "Internal"<<endl;
   } else if (rightSibling <= parent->numKeys) {
     Node *rightNode = parent->pointers[rightSibling];
     cursor->keys[cursor->numKeys] = parent->keys[rightSibling - 1];
@@ -267,10 +271,5 @@ void BPTree::deleteInternal(int x, Node *cursor, Node *child) {
     cursor->numKeys += rightNode->numKeys + 1;
     rightNode->numKeys = 0;
     deleteInternal(parent->keys[rightSibling - 1], parent, rightNode);
-    counter += 1;
-    std::cout<< "Number of nodes deleted: "<<counter<<endl;
-    std::cout<< "Height of B+ Tree after deletion: "<< getHeight()<<endl;
-    displayNode(getRoot());
-    std::cout<< "Internal"<<endl;
   }
 }
