@@ -58,7 +58,7 @@ int main(){
     std::fstream file;
 
     //datasets
-    file.open("data/testdata.tsv",ios::in);
+    file.open("data/data.tsv",ios::in);
     // file.open("data/testdata.tsv",ios::in);
     if (file.is_open()){
         std::string line;
@@ -108,9 +108,8 @@ int main(){
     std::cout.rdbuf(out3.rdbuf()); 
 
     std::cout <<"*************************************Experiment 3*************************************"<<endl;
-    std::cout <<"Retrieving the attribute tconst of those movies with numVotes equal to 500..."<<endl;     
+    std::cout <<"Accessing index blocks with numVotes equal to 500..."<<endl;     
     tree.search(tree.getRoot(), 500, 500);
-     
     
     // std::cout << "\nNo more records found for numVotes equal to 500 "<< endl;
     
@@ -135,7 +134,7 @@ int main(){
     std::cout <<"*************************************Experiment 5*************************************"<<endl;
    
 
-    for(int i=0; i<48; i++){
+    for(int i=0; i<45; i++){
         tree.deleteKey(1000);
     }
     

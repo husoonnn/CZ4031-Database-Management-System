@@ -5,7 +5,6 @@
 #include <cstring>
 #include <iostream>
 
-int const MAX = 23;
 int BPTlevel = 1;
 
 using namespace std;
@@ -360,41 +359,48 @@ int BPTree::getHeight(){
 //   }
 // }
 
-void BPTree::search(Node* cursor, int lowerboundkey, int upperboundkey){
-  int i;
-  bool exist;
-  static bool parentprint;
-  for (i = 0; i < cursor->numKeys+1; i++) {
-    if (cursor->isLeaf == false) {
-      search(cursor->pointers[i], lowerboundkey, upperboundkey);
-      if (parentprint == true){
-        printKeys(cursor);
-        parentprint = false;
+void BPTree::search(Node *node, int lowerboundkey, int upperboundkey)
+{
+
+  int i = 0;
+  static bool printcheck = false;
+  static int recursiondepth = 0;
+  static int newrecursiondepth = 0;
+
+  recursiondepth += 1;
+  newrecursiondepth = recursiondepth;
+  if (node->isLeaf != true) { //if not leaf node
+      for (int i = 0; i < node->numKeys + 1; i++) {
+        search(node->pointers[i], lowerboundkey, upperboundkey);
+        recursiondepth -= 1;
       }
-      if (cursor->keys[i] >= lowerboundkey && cursor->keys[i] <= upperboundkey){
-        exist = true;
-        parentprint = true;
+      if (printcheck == true && recursiondepth < newrecursiondepth){
+        printKeys(node);
+        printcheck = false;
       }
-    }
-    if (cursor->keys[i] >= lowerboundkey && cursor->keys[i] <= upperboundkey){
-      std::cout<<"Key found within range: "<<'\t'<<cursor->keys[i]<<endl;
-      std::cout<<"Tconst of the key found: "<<'\t'<<(char *)(cursor->storagepointer[i].blockAddress)<<endl;
-      std::cout<<"Path taken for search: "<<endl;
-      exist = true;
-      parentprint = true;
-    }
-    if (exist == true){
-      printKeys(cursor);
-      exist = false;
+      if (recursiondepth == 1){
+        printKeys(node);
+      }
+  }
+  for (int i = 0; i < node->numKeys; i++)
+  { 
+    if (node->keys[i] >= lowerboundkey && node->keys[i] <= upperboundkey){
+      if (node->isLeaf == true){
+        displayBlock(node->storagepointer[i].blockAddress, node->keys[i]);
+      }
+      printKeys(node);
+      printcheck = true;
     }
   }
+
 }
 
 void BPTree::printKeys(Node* cursor){
+  std::cout<<"Keys accessed in node: "<<endl;
   for (int i=0; i < cursor->numKeys; i++){
     std::cout<<cursor->keys[i]<<" ";
   }
-  std::cout<<endl;
+  std::cout<<'\n';
 }
 
 void BPTree::displayKeys(Node *node){
@@ -459,7 +465,7 @@ void BPTree::displayBlock(void *blockAddress,int targetvalue)
 
     if (record->numVotes == targetvalue){
       numrecords += 1;
-      std::cout << "[" << record->tconst << "|" << record->averageRating << "|" << record->numVotes << "]";
+      std::cout <<"Record: "<<"[" << record->tconst << "|" << record->averageRating << "|" << record->numVotes << "]";
       totalratings += record->averageRating;
     }
     
@@ -471,4 +477,5 @@ void BPTree::displayBlock(void *blockAddress,int targetvalue)
   std::cout<<"Total number of records: "<<numrecords<<endl;
   std::cout<<"Total average ratings: "<<totalratings<<endl;
   std::cout<<"Average of average ratings: "<<totalratings/numrecords<<endl;
+  std::cout<<endl;
 }
